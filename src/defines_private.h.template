@@ -3,5 +3,23 @@
 
 #define WIFI_SSID ""
 #define WIFI_PASS ""
+#define TIMEZONE 3600 // Use as offset
+
+/*
+ * Button map selection. Current options are 0 and 1
+ *
+ * 0:
+ * BACK ------ SELECT
+ *      |    |
+ *      |    |
+ * LEFT ------ RIGHT
+ *
+ * 1:
+ * LEFT ------ RIGHT
+ *      |    |
+ *      |    |
+ * BACK ------ SELECT
+ */
+#define BUTTON_MAP 0
 
 #endif //TINYWATCHY_DEFINES_PRIVATE_H

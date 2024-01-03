@@ -1,9 +1,31 @@
+/*
+
+This file is part of TinyWatchy.
+Copyright 2023, Michał Szczepaniak <m.szczepaniak.000@gmail.com>
+
+TinyWatchy is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+TinyWatchy is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
 #ifndef TINYWATCHY_DEFINES_H
 #define TINYWATCHY_DEFINES_H
 
-#define MENU_BTN_PIN 26
+// Pins
+#define RIGHT_BTN_PIN 4
+#define LEFT_BTN_PIN 26
+#define SELECT_BTN_PIN 35
 #define BACK_BTN_PIN 25
-#define DOWN_BTN_PIN 4
 #define DISPLAY_CS 5
 #define DISPLAY_RES 9
 #define DISPLAY_DC 10
@@ -12,44 +34,18 @@
 #define ACC_INT_2_PIN 12
 #define VIB_MOTOR_PIN 13
 #define RTC_INT_PIN 27
-
-#define UP_BTN_PIN 35
 #define BATT_ADC_PIN 34
-#define UP_BTN_MASK  GPIO_SEL_35
+
+// HW info
 #define RTC_TYPE 2 //PCF8563
+#define WIFI_HOSTNAME "TinyWatchy"
+#define WIFI_TIMEOUT 60
 
-#define MENU_BTN_MASK GPIO_SEL_26
-#define BACK_BTN_MASK GPIO_SEL_25
-#define DOWN_BTN_MASK GPIO_SEL_4
+// Pin masks
+#define RIGHT_BTN_MASK GPIO_SEL_4
+#define LEFT_BTN_MASK GPIO_SEL_26
+#define SELECT_BTN_MASK GPIO_SEL_35
+#define BACK_BTN_MASK  GPIO_SEL_25
 #define ACC_INT_MASK  GPIO_SEL_14
-
-//display
-#define DISPLAY_WIDTH 200
-#define DISPLAY_HEIGHT 200
-// wifi
-#define WIFI_AP_TIMEOUT 60
-#define WIFI_AP_SSID    "Watchy AP"
-// menue
-#define WATCHFACE_STATE -1
-#define MAIN_MENU_STATE 0
-#define APP_STATE       1
-#define FW_UPDATE_STATE 2
-#define MENU_HEIGHT     25
-#define MENU_LENGTH     7
-// set time
-#define SET_HOUR   0
-#define SET_MINUTE 1
-#define SET_YEAR   2
-#define SET_MONTH  3
-#define SET_DAY    4
-#define HOUR_12_24 24
-// BLE OTA
-#define BLE_DEVICE_NAME        "Watchy BLE OTA"
-#define WATCHFACE_NAME         "Watchy 7 Segment"
-#define SOFTWARE_VERSION_MAJOR 1
-#define SOFTWARE_VERSION_MINOR 0
-#define SOFTWARE_VERSION_PATCH 0
-#define HARDWARE_VERSION_MAJOR 1
-#define HARDWARE_VERSION_MINOR 0
 
 #endif //TINYWATCHY_DEFINES_H

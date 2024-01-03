@@ -1,24 +1,42 @@
-#include <WiFiUdp.h>
-#include <WiFi.h>
+/*
+
+This file is part of TinyWatchy.
+Copyright 2023, Michał Szczepaniak <m.szczepaniak.000@gmail.com>
+
+TinyWatchy is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+TinyWatchy is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
 #include "TinyWatchy.h"
 #include "NTPClient.h"
+#include "WiFiHelper.h"
 
 bool TinyWatchy::_displayFullInit = true;
 BMA423 TinyWatchy::_sensor;
 
-TinyWatchy::TinyWatchy() : _display(new GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>(
-        WatchyDisplay(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY))),
-                           _screen(_display.get(), _screenInfo) {
+TinyWatchy::TinyWatchy() : _smallRTC(new SmallRTC), _display(new GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>(
+        WatchyDisplay(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY))), _screenInfo(new ScreenInfo),
+                           _screen(new Screen(_display.get(), _screenInfo.get())), _ntp(new NTP(_smallRTC.get())),
+                           _menu(new Menu) {
 }
 
 void TinyWatchy::setup() {
-    esp_sleep_wakeup_cause_t wakeupReason;
-    wakeupReason = esp_sleep_get_wakeup_cause();
+    esp_sleep_wakeup_cause_t wakeupReason = esp_sleep_get_wakeup_cause();
 
     Serial.begin(115200);
-    Serial.println("Hello");
 
-    _smallRTC.init();
+    _smallRTC->init();
 
     _display->epd2.selectSPI(SPI, SPISettings(20000000, MSBFIRST, SPI_MODE0));
     _display->init(0, _displayFullInit, 10,
@@ -26,27 +44,32 @@ void TinyWatchy::setup() {
     _display->epd2.setBusyCallback(TinyWatchy::displayBusyCallbackHelper, this);
 
     updateData();
-    _screenInfo.suspend = false;
 
-    switch (wakeupReason) {
+    handleWakeUp(wakeupReason);
+
+    deepSleep();
+}
+
+void TinyWatchy::handleWakeUp(esp_sleep_wakeup_cause_t reason) {
+    switch (reason) {
         case ESP_SLEEP_WAKEUP_EXT0:
-            _sensor.getINT();
-            _screen.update(true);
+            _screen->update(true);
             break;
         case ESP_SLEEP_WAKEUP_EXT1:
-            _screen.update(true);
+            _sensor.getINT();
+            _menu->handleButtonPress();
+            _screenInfo->title = _menu->getTitle();
+            _screenInfo->description = _menu->getDescription();
+            _screen->update(true);
             break;
         default:
             setupAccelerometer();
-            syncNTP();
-            _screen.update(false);
+            _ntp->sync();
+            _screenInfo->title = _menu->getTitle();
+            _screenInfo->description = _menu->getDescription();
+            _screen->update(false);
             break;
     }
-
-    _screenInfo.suspend = true;
-    _screen.update(true);
-
-    deepSleep();
 }
 
 void TinyWatchy::deepSleep() {
@@ -54,8 +77,7 @@ void TinyWatchy::deepSleep() {
     if (_displayFullInit)
         esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
     _displayFullInit = false;
-    _smallRTC.clearAlarm();
-    _smallRTC.nextMinuteWake(true);
+    _smallRTC->clearAlarm();
 
     const uint64_t ignore = 0b11110001000000110000100111000010;
     for (int i = 0; i < GPIO_NUM_MAX; i++) {
@@ -64,28 +86,27 @@ void TinyWatchy::deepSleep() {
         pinMode(i, INPUT);
     }
 
-    esp_sleep_enable_ext0_wakeup((gpio_num_t)RTC_INT_PIN, 0);
-    esp_sleep_enable_ext1_wakeup(MENU_BTN_MASK|BACK_BTN_MASK|UP_BTN_MASK|DOWN_BTN_MASK|ACC_INT_1_PIN, ESP_EXT1_WAKEUP_ANY_HIGH);
+    esp_sleep_enable_ext0_wakeup((gpio_num_t) RTC_INT_PIN, 0);
+    esp_sleep_enable_ext1_wakeup(RIGHT_BTN_MASK | LEFT_BTN_MASK | BACK_BTN_MASK | SELECT_BTN_MASK | ACC_INT_MASK,
+                                 ESP_EXT1_WAKEUP_ANY_HIGH);
     esp_deep_sleep_start();
 }
 
 void TinyWatchy::updateBatteryVoltage() {
     float voltage = static_cast<float>(analogReadMilliVolts(BATT_ADC_PIN)) / 1000.0f * 2.0f;
 
-    voltage = std::clamp(voltage, 3.8f, 4.1f);
+    voltage = std::clamp(voltage, 3.8f, 4.2f);
     voltage -= 3.8;
-    voltage = std::round(voltage * 333.333f);
+    voltage = std::round(voltage * 250.f);
 
-    _screenInfo.battery = static_cast<uint8_t>(voltage);
-//    _screenInfo.title = "Menu";
-//    _screenInfo.description = "Option Option Option";
+    _screenInfo->battery = static_cast<uint8_t>(voltage);
 }
 
 void TinyWatchy::updateData() {
-    _smallRTC.read((tmElements_t&)_screenInfo.time);
+    _smallRTC->read((tmElements_t &) _screenInfo->time);
     updateBatteryVoltage();
     if (!_displayFullInit)
-        _screenInfo.steps = _sensor.getCounter();
+        _screenInfo->steps = _sensor.getCounter();
 }
 
 void TinyWatchy::setupAccelerometer() {
@@ -106,7 +127,7 @@ void TinyWatchy::setupAccelerometer() {
 
     struct bma4_int_pin_config config = {
             .edge_ctrl = BMA4_EDGE_TRIGGER,
-            .lvl       = BMA4_ACTIVE_LOW,
+            .lvl       = BMA4_ACTIVE_HIGH,
             .od        = BMA4_PUSH_PULL,
             .output_en = BMA4_OUTPUT_ENABLE,
             .input_en  = BMA4_INPUT_DISABLE,
@@ -136,7 +157,7 @@ uint16_t TinyWatchy::readRegisterHelper(uint8_t address, uint8_t reg, uint8_t *d
     Wire.beginTransmission(address);
     Wire.write(reg);
     Wire.endTransmission();
-    Wire.requestFrom((uint8_t)address, (uint8_t)len);
+    Wire.requestFrom((uint8_t) address, (uint8_t) len);
     uint8_t i = 0;
     while (Wire.available()) {
         data[i++] = Wire.read();
@@ -149,36 +170,4 @@ uint16_t TinyWatchy::writeRegisterHelper(uint8_t address, uint8_t reg, uint8_t *
     Wire.write(reg);
     Wire.write(data, len);
     return (0 != Wire.endTransmission());
-}
-
-void TinyWatchy::syncNTP() {
-    WiFi.mode(WIFI_STA);
-    WiFi.setAutoReconnect(true);
-    WiFi.setHostname("TinyWatchy");
-    WiFi.begin(WIFI_SSID, WIFI_PASS);
-    WiFi.waitForConnectResult();
-    if (WiFi.status() != WL_CONNECTED) {
-        WiFi.disconnect();
-        WiFi.mode(WIFI_OFF);
-
-        return;
-    }
-
-    WiFiUDP ntpUDP;
-    NTPClient timeClient(ntpUDP);
-
-    timeClient.begin();
-
-    timeClient.update();
-    timeClient.setTimeOffset(3600);
-
-    time_t epochTime = timeClient.getEpochTime();
-
-    tmElements_t time;
-    _smallRTC.BreakTime(epochTime, time);
-    _smallRTC.set(time);
-    timeClient.end();
-
-    WiFi.disconnect();
-    WiFi.mode(WIFI_OFF);
 }

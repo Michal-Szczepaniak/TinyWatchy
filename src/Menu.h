@@ -18,19 +18,36 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef TINYWATCHY_DATETIME_H
-#define TINYWATCHY_DATETIME_H
+#ifndef TINYWATCHY_MENU_H
+#define TINYWATCHY_MENU_H
 
-#include <cstdint>
+#include <string>
+#include <map>
+#include <vector>
+#include "MenuOptions/AbstractOption.h"
+#include "ScreenInfo.h"
 
-typedef struct {
-    uint8_t second;
-    uint8_t minute;
-    uint8_t hour;
-    uint8_t dayOfTheWeek; // day of week, sunday is day 1
-    uint8_t day;
-    uint8_t month;
-    uint8_t year;   // offset from 1970;
-} DateTime;
+class Menu {
+public:
+    Menu();
 
-#endif //TINYWATCHY_DATETIME_H
+    void handleButtonPress();
+
+    std::string getTitle();
+    std::string getDescription();
+
+private:
+    static uint8_t getButtonPressed(const uint64_t &wakeupBit);
+    void nextOption();
+    void prevOption();
+    void selectOption();
+
+private:
+    RTC_DATA_ATTR static uint8_t _level;
+    RTC_DATA_ATTR static uint8_t _optionId;
+    std::vector<AbstractOption*> _options;
+    static const std::map<uint8_t, std::map<uint8_t, int>> _buttonMap;
+};
+
+
+#endif //TINYWATCHY_MENU_H

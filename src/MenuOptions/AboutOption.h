@@ -18,19 +18,19 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef TINYWATCHY_DATETIME_H
-#define TINYWATCHY_DATETIME_H
+#ifndef TINYWATCHY_ABOUTOPTION_H
+#define TINYWATCHY_ABOUTOPTION_H
 
-#include <cstdint>
+#include "AbstractOption.h"
 
-typedef struct {
-    uint8_t second;
-    uint8_t minute;
-    uint8_t hour;
-    uint8_t dayOfTheWeek; // day of week, sunday is day 1
-    uint8_t day;
-    uint8_t month;
-    uint8_t year;   // offset from 1970;
-} DateTime;
+class AboutOption : public AbstractOption {
+public:
+    std::string getTitle() override { return "About"; };
+    std::string getDescription() override { return "TinyWatchy v1.0"; };
+    void onNextButtonPressed() override {};
+    void onPrevButtonPressed() override {};
+    bool onSelectButtonPressed() override { return false; };
+    void onBackButtonPressed() override {};
+};
 
-#endif //TINYWATCHY_DATETIME_H
+#endif //TINYWATCHY_ABOUTOPTION_H

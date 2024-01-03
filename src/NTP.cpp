@@ -18,19 +18,31 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef TINYWATCHY_DATETIME_H
-#define TINYWATCHY_DATETIME_H
+#include "NTP.h"
+#include "WiFiHelper.h"
+#include "NTPClient.h"
 
-#include <cstdint>
+NTP::NTP(SmallRTC *smallRTC) : _smallRTC(smallRTC) {}
 
-typedef struct {
-    uint8_t second;
-    uint8_t minute;
-    uint8_t hour;
-    uint8_t dayOfTheWeek; // day of week, sunday is day 1
-    uint8_t day;
-    uint8_t month;
-    uint8_t year;   // offset from 1970;
-} DateTime;
+void NTP::sync() {
+    if (!WiFiHelper::connect()) {
+        WiFiHelper::disconnect();
+        return;
+    }
 
-#endif //TINYWATCHY_DATETIME_H
+    WiFiUDP ntpUDP;
+    NTPClient timeClient(ntpUDP);
+
+    timeClient.begin();
+
+    timeClient.update();
+    timeClient.setTimeOffset(TIMEZONE);
+
+    time_t epochTime = timeClient.getEpochTime();
+
+    timeClient.end();
+
+    tmElements_t time;
+    _smallRTC->BreakTime(epochTime, time);
+    _smallRTC->set(time);
+}
