@@ -18,13 +18,26 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "TinyWatchy.h"
+#ifndef TINYWATCHY_NTPOPTION_H
+#define TINYWATCHY_NTPOPTION_H
 
-TinyWatchy tinyWatchy;
+#include "AbstractOption.h"
+#include "NTP.h"
 
-void setup() {
-    tinyWatchy.setup();
-}
+class NTPOption : public AbstractOption {
+public:
+    explicit NTPOption(NTP *ntp);
 
-void loop() {
-}
+    std::string getTitle() override { return "NTP Sync"; };
+    std::string getDescription() override;
+    void onNextButtonPressed() override {};
+    void onPrevButtonPressed() override {};
+    bool onSelectButtonPressed() override;
+    void onBackButtonPressed() override {};
+
+private:
+    bool _synced = false;
+    NTP *_ntp;
+};
+
+#endif //TINYWATCHY_NTPOPTION_H

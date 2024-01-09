@@ -45,7 +45,8 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #define RIGHT_BTN_MASK GPIO_SEL_4
 #define LEFT_BTN_MASK GPIO_SEL_26
 #define SELECT_BTN_MASK GPIO_SEL_35
-#define BACK_BTN_MASK  GPIO_SEL_25
-#define ACC_INT_MASK  GPIO_SEL_14
+#define BACK_BTN_MASK GPIO_SEL_25
+#define ACC_INT_MASK GPIO_SEL_14
+#define RTC_INT_MASK GPIO_SEL_27
 
 #endif //TINYWATCHY_DEFINES_H

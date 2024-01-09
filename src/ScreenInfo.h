@@ -31,6 +31,7 @@ struct ScreenInfo {
     uint8_t battery = 0;
     std::string title;
     std::string description;
+    bool humanInSleep = false;
 };
 
 #endif //TINYWATCHY_SCREENINFO_H

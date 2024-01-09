@@ -18,13 +18,24 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "TinyWatchy.h"
+#include "NTPOption.h"
 
-TinyWatchy tinyWatchy;
-
-void setup() {
-    tinyWatchy.setup();
+NTPOption::NTPOption(NTP *ntp) : _ntp(ntp) {
 }
 
-void loop() {
+std::string NTPOption::getDescription() {
+    std::string message = _synced ? "Synced" : "Sync time via NTP";
+
+    _synced = false;
+
+    return message;
+}
+
+bool NTPOption::onSelectButtonPressed() {
+    if (_synced) return false;
+
+    _ntp->sync();
+    _synced = true;
+
+    return false;
 }

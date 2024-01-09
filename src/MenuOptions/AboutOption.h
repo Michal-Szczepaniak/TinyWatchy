@@ -21,16 +21,24 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #ifndef TINYWATCHY_ABOUTOPTION_H
 #define TINYWATCHY_ABOUTOPTION_H
 
+#include <esp_attr.h>
 #include "AbstractOption.h"
+#include "Watchy/bma.h"
 
 class AboutOption : public AbstractOption {
 public:
+    AboutOption(BMA423* accelerometer);
+
     std::string getTitle() override { return "About"; };
-    std::string getDescription() override { return "TinyWatchy v1.0"; };
-    void onNextButtonPressed() override {};
-    void onPrevButtonPressed() override {};
-    bool onSelectButtonPressed() override { return false; };
-    void onBackButtonPressed() override {};
+    std::string getDescription() override;
+    void onNextButtonPressed() override;
+    void onPrevButtonPressed() override;
+    bool onSelectButtonPressed() override;
+    void onBackButtonPressed() override;
+
+private:
+    RTC_DATA_ATTR static uint8_t _option;
+    BMA423* _accelerometer;
 };
 
 #endif //TINYWATCHY_ABOUTOPTION_H

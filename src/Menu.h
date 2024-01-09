@@ -29,8 +29,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 
 class Menu {
 public:
-    Menu();
-
+    void appendOption(AbstractOption *option);
     void handleButtonPress();
 
     std::string getTitle();
@@ -41,6 +40,7 @@ private:
     void nextOption();
     void prevOption();
     void selectOption();
+    void backOption();
 
 private:
     RTC_DATA_ATTR static uint8_t _level;

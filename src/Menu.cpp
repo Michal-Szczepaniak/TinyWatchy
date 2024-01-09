@@ -24,8 +24,6 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "buttons.h"
 #include "defines.h"
 #include "defines_private.h"
-#include "MenuOptions/MenuOption.h"
-#include "MenuOptions/AboutOption.h"
 
 uint8_t Menu::_level = 0;
 uint8_t Menu::_optionId = 0;
@@ -50,10 +48,9 @@ const std::map<uint8_t, std::map<uint8_t, int>> Menu::_buttonMap = {
             }
         }
 };
-
-Menu::Menu() {
-    _options.emplace_back(new MenuOption);
-    _options.emplace_back(new AboutOption);
+void Menu::appendOption(AbstractOption *option) {
+    option->setLevel(&_level);
+    _options.emplace_back(option);
 }
 
 void Menu::handleButtonPress() {
@@ -64,27 +61,20 @@ void Menu::handleButtonPress() {
     }
 
     int buttonPressed = _buttonMap.at(BUTTON_MAP).at(getButtonPressed(wakeupBit));
-    Serial.printf("Button pressed: %d, mapped %d\n", getButtonPressed(wakeupBit), buttonPressed);
 
     switch (buttonPressed) {
         case Button::RIGHT:
-            Serial.println("right");
-            if (!_level)
-                nextOption();
+            nextOption();
             break;
         case Button::LEFT:
-            Serial.println("left");
-            if (!_level)
-                prevOption();
+            prevOption();
             break;
         case Button::SELECT:
-            Serial.println("select");
-//            selectOption();
+            selectOption();
             break;
         case Button::BACK:
-            Serial.println("back");
-//            if (_level)
-//                _level--;
+            if (_level)
+                backOption();
             break;
         default:
             break;
@@ -92,7 +82,6 @@ void Menu::handleButtonPress() {
 }
 
 std::string Menu::getTitle() {
-    Serial.printf("OptionId: %d\n", _optionId);
     return _options[_optionId]->getTitle();
 }
 
@@ -115,36 +104,36 @@ uint8_t Menu::getButtonPressed(const uint64_t &wakeupBit) {
 }
 
 void Menu::nextOption() {
-    Serial.println("next option");
     if (!_level) {
         _optionId++;
 
         if (_optionId == _options.size()) {
             _optionId = 0;
         }
+    } else {
+        _options[_optionId]->onNextButtonPressed();
     }
 }
 
 void Menu::prevOption() {
-    Serial.printf("prev option. level: %d, option: %d\n", _level, _optionId);
     if (!_level) {
         if (_optionId == 0) {
             _optionId = _options.size()-1;
-            Serial.printf("changed option: %d\n", _optionId);
         } else {
             _optionId--;
-            Serial.printf("decreased option: %d\n", _optionId);
         }
+    } else {
+        _options[_optionId]->onPrevButtonPressed();
     }
 }
 
 void Menu::selectOption() {
-    Serial.println("select option");
-    if (!_level) {
+    if (_options[_optionId]->onSelectButtonPressed()) {
         _level++;
-    } else {
-        if (_options[_optionId]->onSelectButtonPressed()) {
-            _level++;
-        }
     }
+}
+
+void Menu::backOption() {
+    _options[_optionId]->onBackButtonPressed();
+    _level--;
 }
