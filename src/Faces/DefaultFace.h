@@ -29,6 +29,8 @@ public:
 
     void draw(ScreenInfo *screenInfo) override;
 
+    static std::string getName() { return "Default"; };
+
 private:
     void drawTime(const DateTime &time);
     void drawBattery(const uint8_t &battery);

@@ -22,6 +22,8 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "AboutOption.h"
 #include "Watchy/bma.h"
 #include "defines.h"
+#include "Faces/UwUFace.h"
+#include "Faces/DefaultFace.h"
 
 uint8_t AboutOption::_option = 0;
 const uint8_t AboutOption::MAX_OPTION = 3;
@@ -62,12 +64,11 @@ std::string AboutOption::getDescription() {
                 return "Change watchface";
             } else {
                 int64_t watchface = _nvs.getInt("watchface", 0);
-                Serial.printf("Watchface %d\n", watchface);
                 switch (watchface) {
                     case 1:
-                        return "uwu_to_owo";
+                        return UwUFace::getName();
                     default:
-                        return "Default";
+                        return DefaultFace::getName();
                 }
             }
         default:
@@ -86,10 +87,8 @@ void AboutOption::onNextButtonPressed() {
         if (_option == 3) {
             int64_t watchface = _nvs.getInt("watchface", 0);
             if (watchface == 1) {
-                Serial.printf("Set watchface %d\n", 0);
                 _nvs.setInt("watchface", 0);
             } else {
-                Serial.printf("Set watchface %d\n", 1);
                 _nvs.setInt("watchface", 1);
             }
         }
