@@ -37,6 +37,7 @@ public:
 
 private:
     bool _synced = false;
+    bool _error = false;
     NTP *_ntp;
 };
 

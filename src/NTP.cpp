@@ -24,10 +24,11 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 
 NTP::NTP(SmallRTC *smallRTC) : _smallRTC(smallRTC) {}
 
-void NTP::sync() {
+bool NTP::sync() {
     if (!WiFiHelper::connect()) {
         WiFiHelper::disconnect();
-        return;
+        Serial.println("Disocnnect");
+        return false;
     }
 
     WiFiUDP ntpUDP;
@@ -35,8 +36,8 @@ void NTP::sync() {
 
     timeClient.begin();
 
-    timeClient.update();
     timeClient.setTimeOffset(TIMEZONE);
+    timeClient.forceUpdate();
 
     time_t epochTime = timeClient.getEpochTime();
 
@@ -45,4 +46,6 @@ void NTP::sync() {
     tmElements_t time;
     _smallRTC->BreakTime(epochTime, time);
     _smallRTC->set(time);
+
+    return true;
 }

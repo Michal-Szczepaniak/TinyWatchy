@@ -39,7 +39,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 // HW info
 #define RTC_TYPE 2 //PCF8563
 #define WIFI_HOSTNAME "TinyWatchy"
-#define WIFI_TIMEOUT 60
+#define WIFI_TIMEOUT 60000
 
 // Pin masks
 #define RIGHT_BTN_MASK GPIO_SEL_4

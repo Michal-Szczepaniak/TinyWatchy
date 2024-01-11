@@ -27,7 +27,7 @@ class NTP {
 public:
     explicit NTP(SmallRTC *smallRTC);
 
-    void sync();
+    bool sync();
 
 private:
     SmallRTC *_smallRTC{};

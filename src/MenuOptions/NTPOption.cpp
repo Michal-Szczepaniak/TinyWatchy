@@ -24,9 +24,10 @@ NTPOption::NTPOption(NTP *ntp) : _ntp(ntp) {
 }
 
 std::string NTPOption::getDescription() {
-    std::string message = _synced ? "Synced" : "Sync time via NTP";
+    std::string message = _error ? "Error syncing" : _synced ? "Synced" : "Sync time via NTP";
 
     _synced = false;
+    _error = false;
 
     return message;
 }
@@ -34,8 +35,11 @@ std::string NTPOption::getDescription() {
 bool NTPOption::onSelectButtonPressed() {
     if (_synced) return false;
 
-    _ntp->sync();
-    _synced = true;
+    if (!_ntp->sync()) {
+        _error = true;
+    } else {
+        _synced = true;
+    }
 
     return false;
 }

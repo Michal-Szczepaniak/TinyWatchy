@@ -18,23 +18,28 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#include "Screen.h"
-#include "Faces/DefaultFace.h"
-#include "Faces/UwUFace.h"
+#ifndef TINYWATCHY_UWUFACE_H
+#define TINYWATCHY_UWUFACE_H
 
-Screen::Screen(GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *display, ScreenInfo *screenInfo) :
-        _display(display), _screenInfo(screenInfo) {
-    _faces.emplace_back(std::make_unique<DefaultFace>(display));
-    _faces.emplace_back(std::make_unique<UwUFace>(display));
-    _nvs.begin();
-}
+#include "AbstractFace.h"
+#include <vector>
 
-void Screen::update(bool partial) {
-    _display->setFullWindow();
-    _display->fillScreen(GxEPD_WHITE);
+class UwUFace : public AbstractFace {
+public:
+    explicit UwUFace(GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *display);
 
-    int watchface = _nvs.getInt("watchface", 0);
-    _faces.at(watchface)->draw(_screenInfo);
+    void draw(ScreenInfo *screenInfo) override;
 
-    _display->display(partial);
-}
+private:
+    void drawTime(const DateTime &time);
+    void drawBattery(const uint8_t &battery);
+    void drawSteps(const unsigned int &steps);
+    void drawMenuTitle(const std::string &title);
+    void drawMenuDescription(const std::string &description);
+
+    static const unsigned char* const EMOTES[];
+    RTC_DATA_ATTR static long _lastEmote;
+};
+
+
+#endif //TINYWATCHY_UWUFACE_H

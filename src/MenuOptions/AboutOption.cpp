@@ -24,8 +24,10 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "defines.h"
 
 uint8_t AboutOption::_option = 0;
+const uint8_t AboutOption::MAX_OPTION = 3;
 
 AboutOption::AboutOption(BMA423 *accelerometer) : _accelerometer(accelerometer) {
+    _nvs.begin();
 }
 
 std::string AboutOption::getDescription() {
@@ -55,31 +57,69 @@ std::string AboutOption::getDescription() {
             out << std::fixed << voltage;
             return out.str() + " V";
         }
+        case 3:
+            if (*_level < 2) {
+                return "Change watchface";
+            } else {
+                int64_t watchface = _nvs.getInt("watchface", 0);
+                Serial.printf("Watchface %d\n", watchface);
+                switch (watchface) {
+                    case 1:
+                        return "uwu_to_owo";
+                    default:
+                        return "Default";
+                }
+            }
         default:
             return "TinyWatchy v1.0";
     }
 }
 
 void AboutOption::onNextButtonPressed() {
-    _option++;
+    if (*_level < 2) {
+        _option++;
 
-    if (_option == 3) {
-        _option = 0;
+        if (_option == MAX_OPTION + 1) {
+            _option = 0;
+        }
+    } else {
+        if (_option == 3) {
+            int64_t watchface = _nvs.getInt("watchface", 0);
+            if (watchface == 1) {
+                Serial.printf("Set watchface %d\n", 0);
+                _nvs.setInt("watchface", 0);
+            } else {
+                Serial.printf("Set watchface %d\n", 1);
+                _nvs.setInt("watchface", 1);
+            }
+        }
     }
 }
 
 void AboutOption::onPrevButtonPressed() {
-    if (_option == 0) {
-        _option = 2;
+    if (*_level < 2) {
+        if (_option == 0) {
+            _option = MAX_OPTION;
+        } else {
+            _option--;
+        }
     } else {
-        _option--;
+        if (_option == 3) {
+            int64_t watchface = _nvs.getInt("watchface", 0);
+            if (watchface == 1) {
+                _nvs.setInt("watchface", 0);
+            } else {
+                _nvs.setInt("watchface", 1);
+            }
+        }
     }
 }
 
 bool AboutOption::onSelectButtonPressed() {
-    return !(*_level);
+    return (!(*_level)) || (_option == 3);
 }
 
 void AboutOption::onBackButtonPressed() {
-    _option = 0;
+    if (*_level < 2)
+        _option = 0;
 }

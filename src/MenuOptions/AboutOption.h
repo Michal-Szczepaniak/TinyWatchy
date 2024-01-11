@@ -24,6 +24,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include <esp_attr.h>
 #include "AbstractOption.h"
 #include "Watchy/bma.h"
+#include "ArduinoNvs.h"
 
 class AboutOption : public AbstractOption {
 public:
@@ -39,6 +40,8 @@ public:
 private:
     RTC_DATA_ATTR static uint8_t _option;
     BMA423* _accelerometer;
+    ArduinoNvs _nvs;
+    static const uint8_t MAX_OPTION;
 };
 
 #endif //TINYWATCHY_ABOUTOPTION_H

@@ -41,6 +41,7 @@ TinyWatchy::TinyWatchy() : _smallRTC(new SmallRTC), _display(new GxEPD2_BW<Watch
 void TinyWatchy::setup() {
     esp_sleep_wakeup_cause_t wakeupReason = esp_sleep_get_wakeup_cause();
 
+    Serial.begin(115200);
     Wire.begin(SDA, SCL);
     _smallRTC->init();
 
@@ -69,7 +70,6 @@ void TinyWatchy::handleWakeUp(esp_sleep_wakeup_cause_t reason) {
             break;
         default:
             setupAccelerometer();
-            _ntp->sync();
             updateMenu();
             _screen->update(false);
             break;
