@@ -19,6 +19,8 @@ To get started with TinyWatchy, follow these steps:
 
 We welcome bug reports, feature requests, and pull requests.
 
+Read [documentation](docs/Index.md).
+
 ## License
 
 TinyWatchy is released under the [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html). See the [LICENSE](https://github.com/Michal-Szczepaniak/TinyWatchy/blob/master/COPYING) file for details.
