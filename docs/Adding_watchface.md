@@ -36,9 +36,9 @@ Inside `draw()` method, first, I draw background for my watchface. To draw added
 
 > _display->drawBitmap(
 > 
-> <position x on the screen>,
+> position x on the screen,
 > 
-> <position y on the screen>,
+> position y on the screen,
 > 
 > resources::EXAMPLE_IMAGE,
 > 
