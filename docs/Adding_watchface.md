@@ -98,7 +98,7 @@ Again, how you draw it is up to you, I'm using icon from original Watchy firmwar
 
 As most of the methods were explained already only one left is:
 
-> `_display->fillRect(X, Y, WIDTH, HEIGHT, GxEPD_BLACK/GxEPD_WHITE)`
+> _display->fillRect(X, Y, WIDTH, HEIGHT, GxEPD_BLACK/GxEPD_WHITE)
  
 This is used to draw filled rectangle. 
 
