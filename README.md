@@ -4,7 +4,7 @@ TinyWatchy is an alternative firmware for Watchy, designed with a focus on power
 
 ## Features
 
-- **Power Efficiency**: Optimize battery usage to extend the device's runtime.
+- **Power Efficiency**: Optimize battery usage to extend the device's runtime. It can last 5 weeks on 250mAh battery.
 - **Simplicity**: Streamlined user interface for easy navigation and a hassle-free experience.
 - **Customization**: Tailor the firmware to your preferences with customizable settings.
 - **Low Resource Consumption**: Keep resource usage minimal for smoother performance.
