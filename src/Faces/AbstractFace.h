@@ -32,7 +32,7 @@ public:
 
     virtual void draw(ScreenInfo *screenInfo) = 0;
 
-    static std::string getName() { return "abstract"; };
+    virtual std::string getName() = 0;
 
 protected:
     GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *_display;

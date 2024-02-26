@@ -28,7 +28,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 uint8_t AboutOption::_option = 0;
 const uint8_t AboutOption::MAX_OPTION = 3;
 
-AboutOption::AboutOption(BMA423 *accelerometer) : _accelerometer(accelerometer) {
+AboutOption::AboutOption(BMA423 *accelerometer, Screen *screen) : _accelerometer(accelerometer), _screen(screen) {
     _nvs.begin();
 }
 
@@ -64,12 +64,7 @@ std::string AboutOption::getDescription() {
                 return "Change watchface";
             } else {
                 int64_t watchface = _nvs.getInt("watchface", 0);
-                switch (watchface) {
-                    case 1:
-                        return UwUFace::getName();
-                    default:
-                        return DefaultFace::getName();
-                }
+                return _screen->getFaces().at(watchface)->getName();
             }
         default:
             return "TinyWatchy v1.0";
@@ -86,11 +81,8 @@ void AboutOption::onNextButtonPressed() {
     } else {
         if (_option == 3) {
             int64_t watchface = _nvs.getInt("watchface", 0);
-            if (watchface == 1) {
-                _nvs.setInt("watchface", 0);
-            } else {
-                _nvs.setInt("watchface", 1);
-            }
+            uint32_t watchFaceCount = _screen->getFaces().size();
+            _nvs.setInt("watchface", watchface % watchFaceCount);
         }
     }
 }
@@ -105,11 +97,8 @@ void AboutOption::onPrevButtonPressed() {
     } else {
         if (_option == 3) {
             int64_t watchface = _nvs.getInt("watchface", 0);
-            if (watchface == 1) {
-                _nvs.setInt("watchface", 0);
-            } else {
-                _nvs.setInt("watchface", 1);
-            }
+            uint32_t watchFaceCount = _screen->getFaces().size();
+            _nvs.setInt("watchface", watchface - 1 < 0 ? watchFaceCount - 1 : watchface - 1);
         }
     }
 }

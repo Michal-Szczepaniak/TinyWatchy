@@ -48,6 +48,7 @@ const std::map<uint8_t, std::map<uint8_t, int>> Menu::_buttonMap = {
             }
         }
 };
+
 void Menu::appendOption(AbstractOption *option) {
     option->setLevel(&_level);
     _options.emplace_back(option);
@@ -136,4 +137,8 @@ void Menu::selectOption() {
 void Menu::backOption() {
     _options[_optionId]->onBackButtonPressed();
     _level--;
+}
+
+bool Menu::isMainOption() {
+    return _optionId == 0;
 }

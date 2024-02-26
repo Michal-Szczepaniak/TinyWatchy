@@ -31,6 +31,7 @@ class Screen {
 public:
     explicit Screen(GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *display, ScreenInfo *screenInfo);
     void update(bool partial = false);
+    const std::vector<std::unique_ptr<AbstractFace>>& getFaces() const;
 
 private:
     GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *_display;

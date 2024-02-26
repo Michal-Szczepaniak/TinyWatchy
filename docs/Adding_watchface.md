@@ -9,8 +9,8 @@ Every watchface **has to** extend `AbstractFace` interface.
 `AbstractFace` consts of following methods:
 
 - `constructor`: It has dependency injection on the display driver to be able to draw on the screen.
-- `draw(ScreenInfo*)`: Method called by the `Screen` to draw your watchface. It's argument is `ScreenInfo` which consists of informations to be displayed. **Every variable has to be displayed, doesn't matter how but every one has to be displayed.** For example you can display hour as a sunset or battery as a bar at the top it doesn't matter as long as they're displayed. That's important for integrity of entire firmware.
-- `getName()`: This method **has to** be overwritten (basically just copied) because it provides name of the watchface to the `Menu`.
+- `draw(ScreenInfo*)`: Method called by the `Screen` to draw your watchface. It's argument is `ScreenInfo` which consists of informations to be displayed. **Every variable has to be displayed, doesn't matter how but every one has to be displayed.** For example you can display hour as a sunset or battery as a bar at the top it doesn't matter as long as they're displayed. That's important for integrity of entire firmware. Displaying menu can be skipped for aesthetic purposes if `onMainOption` is true.
+- `getName()`: This method provides name of the watchface to the `Menu`.
 
 ## Developing
 

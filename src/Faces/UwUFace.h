@@ -30,7 +30,7 @@ public:
 
     void draw(ScreenInfo *screenInfo) override;
 
-    static std::string getName() { return "uwu_to_owo"; };
+    std::string getName() override { return "uwu_to_owo"; };
 
 private:
     void drawTime(const DateTime &time);

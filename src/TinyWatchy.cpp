@@ -35,7 +35,7 @@ TinyWatchy::TinyWatchy() : _smallRTC(new SmallRTC), _display(new GxEPD2_BW<Watch
 
     _menu->appendOption(new MenuOption);
     _menu->appendOption(new NTPOption(_ntp.get()));
-    _menu->appendOption(new AboutOption(&_accelerometer));
+    _menu->appendOption(new AboutOption(&_accelerometer, _screen.get()));
 }
 
 void TinyWatchy::setup() {
@@ -133,6 +133,7 @@ void TinyWatchy::updateData() {
 void TinyWatchy::updateMenu() {
     _screenInfo->title = _menu->getTitle();
     _screenInfo->description = _menu->getDescription();
+    _screenInfo->onMainOption = _menu->isMainOption();
 }
 
 void TinyWatchy::setupAccelerometer() {

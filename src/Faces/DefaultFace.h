@@ -29,7 +29,7 @@ public:
 
     void draw(ScreenInfo *screenInfo) override;
 
-    static std::string getName() { return "Default"; };
+    std::string getName() override { return "Default"; };
 
 private:
     void drawTime(const DateTime &time);

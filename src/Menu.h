@@ -26,6 +26,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include "MenuOptions/AbstractOption.h"
 #include "ScreenInfo.h"
+#include "Screen.h"
 
 class Menu {
 public:
@@ -34,6 +35,7 @@ public:
 
     std::string getTitle();
     std::string getDescription();
+    static bool isMainOption() ;
 
 private:
     static uint8_t getButtonPressed(const uint64_t &wakeupBit);
@@ -47,6 +49,7 @@ private:
     RTC_DATA_ATTR static uint8_t _optionId;
     std::vector<AbstractOption*> _options;
     static const std::map<uint8_t, std::map<uint8_t, int>> _buttonMap;
+    Screen *_screen;
 };
 
 

@@ -25,10 +25,11 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "AbstractOption.h"
 #include "Watchy/bma.h"
 #include "ArduinoNvs.h"
+#include "Screen.h"
 
 class AboutOption : public AbstractOption {
 public:
-    AboutOption(BMA423* accelerometer);
+    AboutOption(BMA423* accelerometer, Screen *screen);
 
     std::string getTitle() override { return "About"; };
     std::string getDescription() override;
@@ -40,6 +41,7 @@ public:
 private:
     RTC_DATA_ATTR static uint8_t _option;
     BMA423* _accelerometer;
+    Screen* _screen;
     ArduinoNvs _nvs;
     static const uint8_t MAX_OPTION;
 };

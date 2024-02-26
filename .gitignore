@@ -1,2 +1,5 @@
 .pio
+resources/images/private
+src/resources.h
 src/defines_private.h
+src/Faces/Private
