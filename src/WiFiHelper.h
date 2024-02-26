@@ -28,12 +28,13 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 class WiFiHelper {
 public:
     static bool connect() {
-        if (WiFiClass::getMode() != WIFI_STA) {
-            WiFiClass::mode(WIFI_STA);
+        WiFi.setHostname(WIFI_HOSTNAME);
+
+        if (WiFi.getMode() != WIFI_STA) {
+            WiFi.mode(WIFI_STA);
         }
 
         WiFi.setAutoReconnect(true);
-        WiFiClass::setHostname(WIFI_HOSTNAME);
         WiFi.begin(WIFI_SSID, WIFI_PASS);
         if (WiFi.waitForConnectResult(WIFI_TIMEOUT) != WL_CONNECTED) {
             return false;

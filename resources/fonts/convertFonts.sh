@@ -16,7 +16,7 @@ fi
 
 for d in *
 do
-    if [[ $d == *".sh"* ]] || [[ $d == *".h"* ]]; then
+    if [[ $d == *".sh"* ]] || [[ $d == *".h"* ]] || [[ $d == "private" ]]; then
         continue
     fi
 

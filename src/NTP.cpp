@@ -27,7 +27,7 @@ NTP::NTP(SmallRTC *smallRTC) : _smallRTC(smallRTC) {}
 bool NTP::sync() {
     if (!WiFiHelper::connect()) {
         WiFiHelper::disconnect();
-        Serial.println("Disocnnect");
+        Serial.println("Disconnect");
         return false;
     }
 

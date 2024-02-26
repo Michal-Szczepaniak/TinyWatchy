@@ -1,5 +1,8 @@
 .pio
 resources/images/private
+resources/fonts/private
 src/resources.h
 src/defines_private.h
 src/Faces/Private
+src/MenuOptions/Private
+src/Private

@@ -87,18 +87,16 @@ void UwUFace::drawTime(const DateTime &time) {
 }
 
 void UwUFace::drawBattery(const uint8_t &battery) {
-    _display->drawBitmap(95, 55, ICON_BATTERY, 37, 21, GxEPD_BLACK);
-    _display->fillRect(100, 60, 27, 11, GxEPD_WHITE);
-    _display->fillRect(100, 60, static_cast<int16_t>(std::round(static_cast<float>(battery) / 4)), 11, GxEPD_BLACK);
+    drawBatteryIcon(90, 55, battery, _display);
     _display->setFont(&resources::EIGHT_BIT_OPERATOR_PLUS_REGULAR_12);
-    _display->setCursor(135, 73);
+    _display->setCursor(130, 73);
     _display->print(String(battery) + "%");
 }
 
 void UwUFace::drawSteps(const unsigned int &steps) {
     _display->setFont(&resources::EIGHT_BIT_OPERATOR_PLUS_REGULAR_12);
-    _display->drawBitmap(105, 84, ICON_STEPS, 19, 23, GxEPD_BLACK);
-    _display->setCursor(135, 103);
+    _display->drawBitmap(100, 84, ICON_STEPS, 19, 23, GxEPD_BLACK);
+    _display->setCursor(130, 103);
     _display->println(steps);
 }
 

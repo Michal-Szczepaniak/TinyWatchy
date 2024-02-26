@@ -23,7 +23,8 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "WiFiHelper.h"
 #include "MenuOptions/MenuOption.h"
 #include "MenuOptions/NTPOption.h"
-#include "MenuOptions/AboutOption.h"
+#include "MenuOptions/SettingsOption.h"
+#include "MenuOptions/Private/Include.h"
 
 bool TinyWatchy::_displayFullInit = true;
 BMA423 TinyWatchy::_accelerometer;
@@ -31,11 +32,14 @@ BMA423 TinyWatchy::_accelerometer;
 TinyWatchy::TinyWatchy() : _smallRTC(new SmallRTC), _display(new GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>(
         WatchyDisplay(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY))), _screenInfo(new ScreenInfo),
                            _screen(new Screen(_display.get(), _screenInfo.get())), _ntp(new NTP(_smallRTC.get())),
-                           _menu(new Menu) {
+                           _menu(new Menu), _alarmHandler(new AlarmHandler(_smallRTC.get(), &_accelerometer)) {
 
     _menu->appendOption(new MenuOption);
     _menu->appendOption(new NTPOption(_ntp.get()));
-    _menu->appendOption(new AboutOption(&_accelerometer, _screen.get()));
+#ifdef PRIVATE
+    Private::includeOptions(_menu.get());
+#endif
+    _menu->appendOption(new SettingsOption(&_accelerometer, _screen.get()));
 }
 
 void TinyWatchy::setup() {
@@ -60,6 +64,7 @@ void TinyWatchy::handleWakeUp(esp_sleep_wakeup_cause_t reason) {
     switch (reason) {
         case ESP_SLEEP_WAKEUP_EXT0:
             updateMenu();
+            _alarmHandler->handle(_screenInfo.get());
             _screen->update(true);
             break;
         case ESP_SLEEP_WAKEUP_EXT1:

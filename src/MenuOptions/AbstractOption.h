@@ -34,12 +34,12 @@ public:
     virtual bool onSelectButtonPressed() = 0;
     virtual void onBackButtonPressed() = 0;
 
-    void setLevel(uint8_t *level) {
+    void setLevel(uint8_t const *level) {
         _level = level;
     }
 
 protected:
-    uint8_t *_level;
+    uint8_t const *_level;
 };
 
 #endif //TINYWATCHY_ABSTRACTOPTION_H

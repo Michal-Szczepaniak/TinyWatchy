@@ -18,8 +18,8 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-#ifndef TINYWATCHY_ABOUTOPTION_H
-#define TINYWATCHY_ABOUTOPTION_H
+#ifndef TINYWATCHY_SETTINGSOPTION_H
+#define TINYWATCHY_SETTINGSOPTION_H
 
 #include <esp_attr.h>
 #include "AbstractOption.h"
@@ -27,11 +27,11 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "ArduinoNvs.h"
 #include "Screen.h"
 
-class AboutOption : public AbstractOption {
+class SettingsOption : public AbstractOption {
 public:
-    AboutOption(BMA423* accelerometer, Screen *screen);
+    SettingsOption(BMA423* accelerometer, Screen *screen);
 
-    std::string getTitle() override { return "About"; };
+    std::string getTitle() override { return "Settings"; };
     std::string getDescription() override;
     void onNextButtonPressed() override;
     void onPrevButtonPressed() override;
@@ -46,4 +46,4 @@ private:
     static const uint8_t MAX_OPTION;
 };
 
-#endif //TINYWATCHY_ABOUTOPTION_H
+#endif //TINYWATCHY_SETTINGSOPTION_H

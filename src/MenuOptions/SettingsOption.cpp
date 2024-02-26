@@ -19,20 +19,20 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <sstream>
-#include "AboutOption.h"
+#include "SettingsOption.h"
 #include "Watchy/bma.h"
 #include "defines.h"
 #include "Faces/UwUFace.h"
 #include "Faces/DefaultFace.h"
 
-uint8_t AboutOption::_option = 0;
-const uint8_t AboutOption::MAX_OPTION = 3;
+uint8_t SettingsOption::_option = 0;
+const uint8_t SettingsOption::MAX_OPTION = 3;
 
-AboutOption::AboutOption(BMA423 *accelerometer, Screen *screen) : _accelerometer(accelerometer), _screen(screen) {
+SettingsOption::SettingsOption(BMA423 *accelerometer, Screen *screen) : _accelerometer(accelerometer), _screen(screen) {
     _nvs.begin();
 }
 
-std::string AboutOption::getDescription() {
+std::string SettingsOption::getDescription() {
     switch (_option) {
         case 1:
         {
@@ -71,7 +71,7 @@ std::string AboutOption::getDescription() {
     }
 }
 
-void AboutOption::onNextButtonPressed() {
+void SettingsOption::onNextButtonPressed() {
     if (*_level < 2) {
         _option++;
 
@@ -82,12 +82,12 @@ void AboutOption::onNextButtonPressed() {
         if (_option == 3) {
             int64_t watchface = _nvs.getInt("watchface", 0);
             uint32_t watchFaceCount = _screen->getFaces().size();
-            _nvs.setInt("watchface", watchface % watchFaceCount);
+            _nvs.setInt("watchface", (watchface + 1) % watchFaceCount);
         }
     }
 }
 
-void AboutOption::onPrevButtonPressed() {
+void SettingsOption::onPrevButtonPressed() {
     if (*_level < 2) {
         if (_option == 0) {
             _option = MAX_OPTION;
@@ -103,11 +103,11 @@ void AboutOption::onPrevButtonPressed() {
     }
 }
 
-bool AboutOption::onSelectButtonPressed() {
+bool SettingsOption::onSelectButtonPressed() {
     return (!(*_level)) || (_option == 3);
 }
 
-void AboutOption::onBackButtonPressed() {
+void SettingsOption::onBackButtonPressed() {
     if (*_level < 2)
         _option = 0;
 }

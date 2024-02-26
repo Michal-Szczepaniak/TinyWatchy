@@ -57,9 +57,7 @@ void DefaultFace::drawTime(const DateTime &time) {
 }
 
 void DefaultFace::drawBattery(const uint8_t &battery) {
-    _display->drawBitmap(150, 75, ICON_BATTERY, 37, 21, GxEPD_BLACK);
-    _display->fillRect(155, 80, 27, 11, GxEPD_WHITE);
-    _display->fillRect(155, 80, static_cast<int16_t>(std::round(static_cast<float>(battery) / 4)), 11, GxEPD_BLACK);
+    drawBatteryIcon(150, 75, battery, _display);
     _display->setFont(&resources::DIGITAL_DISPLAY_REGULAR_15);
     _display->setCursor(108, 94);
     _display->print(String(battery));

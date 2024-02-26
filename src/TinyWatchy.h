@@ -31,9 +31,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "Screen.h"
 #include "NTP.h"
 #include "Menu.h"
-
-#define SLEEP_START 1
-#define SLEEP_END 9
+#include "AlarmHandler.h"
 
 class TinyWatchy {
 public:
@@ -64,6 +62,7 @@ private:
     std::unique_ptr<Screen> _screen;
     std::unique_ptr<NTP> _ntp;
     std::unique_ptr<Menu> _menu;
+    std::unique_ptr<AlarmHandler> _alarmHandler;
     RTC_DATA_ATTR static BMA423 _accelerometer;
     RTC_DATA_ATTR static bool _displayFullInit;
 };

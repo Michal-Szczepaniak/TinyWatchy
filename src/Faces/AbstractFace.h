@@ -22,6 +22,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #define TINYWATCHY_ABSTRACTFACE_H
 
 #include "Watchy/Display.h"
+#include "Watchy/icons.h"
 #include "ScreenInfo.h"
 #include <GxEPD2_BW.h>
 
@@ -33,6 +34,17 @@ public:
     virtual void draw(ScreenInfo *screenInfo) = 0;
 
     virtual std::string getName() = 0;
+
+    static void drawBatteryIcon(
+        int x,
+        int y,
+        const uint8_t &battery,
+        GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *display
+    ) {
+        display->drawBitmap(x, y, ICON_BATTERY, 37, 21, GxEPD_BLACK);
+        display->fillRect(x+5, y+5, 27, 11, GxEPD_WHITE);
+        display->fillRect(x+5, y+5, static_cast<int16_t>(std::round(static_cast<float>(battery) / 4)), 11, GxEPD_BLACK);
+    }
 
 protected:
     GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *_display;

@@ -5,6 +5,9 @@
 #define WIFI_PASS ""
 #define TIMEZONE 3600 // Use as offset
 
+#define SLEEP_START 1
+#define SLEEP_END 9
+
 /*
  * Button map selection. Current options are 0 and 1
  *
