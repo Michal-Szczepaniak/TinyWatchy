@@ -108,7 +108,9 @@ I am using steps icon from original Watchy firmware as well as printing number.
 
 ### `drawMenuTitle()`, `drawMenuDescription` methods
 
-This methods draw menu title and description. Make sure you give it enough space so that it won't interfere with your watchface. Please don't cut it, I will standardise maximum length on later date. They are used for UX, interfacing with features.
+This methods draw menu title and description. Make sure you give it enough space so that it won't interfere with your watchface. Do not cut it. They are used for UX, interfacing with features.
+
+Title has max length of 10 characters, while description has 20. You can verify if they don't interfere with your ui, by using UI test in settings.
 
 > _display->getTextBounds()
  
