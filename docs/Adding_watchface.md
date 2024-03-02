@@ -119,6 +119,5 @@ This method gets width of to be drawn text so that I can center it.
 To add your watchface you need to:
 
 - Add it in `Screen.cpp` by adding `_faces.emplace_back(std::make_unique<YourFace>(display));` in the constructor. Add it at the end of the list.
-- Add it in `AboutOption.cpp` in line 66, 89 and 108. For now there's no better system but will be added once there are more watchfaces.
 
-You should be able to head to About option on the watch and select your watchface in the submenu.
+You should be able to head to Settings option on the watch and select your watchface in the submenu.
