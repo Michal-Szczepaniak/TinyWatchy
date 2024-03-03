@@ -23,21 +23,21 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 
 #include "Watchy/Display.h"
 #include "Faces/AbstractFace.h"
+#include "ArduinoNvs.h"
 #include <GxEPD2_BW.h>
 #include <memory>
-#include <ArduinoNvs.h>
 
 class Screen {
 public:
-    explicit Screen(GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *display, ScreenInfo *screenInfo);
+    explicit Screen(GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *display, const ScreenInfo &screenInfo, ArduinoNvs *nvs);
     void update(bool partial = false);
     const std::vector<std::unique_ptr<AbstractFace>>& getFaces() const;
 
 private:
     GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *_display;
     std::vector<std::unique_ptr<AbstractFace>> _faces;
-    ScreenInfo *_screenInfo;
-    ArduinoNvs _nvs;
+    const ScreenInfo &_screenInfo;
+    ArduinoNvs *_nvs;
 };
 
 

@@ -24,18 +24,29 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <map>
 #include <vector>
+#include <stack>
 #include "MenuOptions/AbstractOption.h"
+#include "MenuOptions/MenuOption.h"
 #include "ScreenInfo.h"
 #include "Screen.h"
+#include "MenuPage.h"
+#include "MenuOptions/NTPOption.h"
+#include "MenuOptions/SubMenuOption.h"
+#include "MenuOptions/AccelerometerOption.h"
+#include "MenuOptions/AboutOption.h"
+#include "MenuOptions/VoltageOption.h"
+#include "MenuOptions/WatchfaceOption.h"
+#include "MenuOptions/DriftOption.h"
+#include "MenuOptions/UiOption.h"
 
 class Menu {
 public:
-    void appendOption(AbstractOption *option);
+    Menu(NTP *ntp, BMA423* accelerometer, SmallRTC *smallRTC, Screen *screen, ArduinoNvs *nvs);
     void handleButtonPress();
 
     std::string getTitle();
     std::string getDescription();
-    static bool isMainOption() ;
+    bool isMainOption();
 
 private:
     static uint8_t getButtonPressed(const uint64_t &wakeupBit);
@@ -43,13 +54,50 @@ private:
     void prevOption();
     void selectOption();
     void backOption();
+    const MenuPage& getCurrentPage();
+    AbstractOption* getCurrentItem();
+    StackPage& getCurrentStackPage();
+    void changePage(uint8_t menuPage);
 
 private:
-    RTC_DATA_ATTR static uint8_t _level;
-    RTC_DATA_ATTR static uint8_t _optionId;
-    std::vector<AbstractOption*> _options;
+    RTC_DATA_ATTR static uint8_t _currentStackPage;
+    RTC_DATA_ATTR static StackPage _pageStack[3];
     static const std::map<uint8_t, std::map<uint8_t, int>> _buttonMap;
     Screen *_screen;
+    MenuOption _menuOption;
+    NTPOption _ntpOption;
+    SubMenuOption _settingsSubmenu;
+    AboutOption _aboutOption;
+    VoltageOption _voltageOption;
+    AccelerometerOption _accelerometerOption;
+    WatchfaceOption _watchfaceOption;
+    DriftOption _driftOption;
+    UiOption _uiOption;
+#if PRIVATE == 1
+    AbstractOption *_abstractOption1;
+#endif
+    const MenuPage _pages[2] = {
+        {
+            .items = {
+                &_menuOption,
+                &_ntpOption,
+#if PRIVATE == 1
+                _abstractOption1,
+#endif
+                &_settingsSubmenu,
+            },
+        },
+        {
+            .items = {
+                &_aboutOption,
+                &_accelerometerOption,
+                &_voltageOption,
+                &_watchfaceOption,
+                &_driftOption,
+                &_uiOption,
+            }
+        }
+    };
 };
 
 

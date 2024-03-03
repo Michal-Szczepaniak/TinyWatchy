@@ -22,24 +22,19 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #define TINYWATCHY_ABSTRACTOPTION_H
 
 #include <string>
+#include <vector>
+#include "StackPage.h"
 
 class AbstractOption {
 public:
     virtual ~AbstractOption() = default;
 
     virtual std::string getTitle() = 0;
-    virtual std::string getDescription() = 0;
+    virtual std::string getDescription(const StackPage& stackPage) = 0;
     virtual void onNextButtonPressed() = 0;
     virtual void onPrevButtonPressed() = 0;
-    virtual bool onSelectButtonPressed() = 0;
+    virtual bool onSelectButtonPressed(const StackPage& stackPage) = 0;
     virtual void onBackButtonPressed() = 0;
-
-    void setLevel(uint8_t const *level) {
-        _level = level;
-    }
-
-protected:
-    uint8_t const *_level;
 };
 
 #endif //TINYWATCHY_ABSTRACTOPTION_H

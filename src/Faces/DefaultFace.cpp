@@ -26,13 +26,13 @@ DefaultFace::DefaultFace(GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *displa
 
 }
 
-void DefaultFace::draw(ScreenInfo *screenInfo) {
+void DefaultFace::draw(const ScreenInfo &screenInfo) {
     _display->drawBitmap(0, 0, resources::WATCHFACE_DEFAULT_IMAGE, 200, 200, GxEPD_BLACK);
-    drawTime(screenInfo->time);
-    drawBattery(screenInfo->battery);
-    drawSteps(screenInfo->steps);
-    drawMenuTitle(screenInfo->title);
-    drawMenuDescription(screenInfo->description);
+    drawTime(screenInfo.time);
+    drawBattery(screenInfo.battery);
+    drawSteps(screenInfo.steps);
+    drawMenuTitle(screenInfo.title);
+    drawMenuDescription(screenInfo.description);
 }
 
 void DefaultFace::drawTime(const DateTime &time) {

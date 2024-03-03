@@ -31,7 +31,7 @@ public:
     explicit AbstractFace(GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *display) : _display(display) {};
     virtual ~AbstractFace() = default;
 
-    virtual void draw(ScreenInfo *screenInfo) = 0;
+    virtual void draw(const ScreenInfo &screenInfo) = 0;
 
     virtual std::string getName() = 0;
 

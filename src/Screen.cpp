@@ -21,25 +21,24 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "Screen.h"
 #include "Faces/DefaultFace.h"
 #include "Faces/UwUFace.h"
-#ifdef PRIVATE
+#if PRIVATE == 1
 #include "Faces/Private/Include.h"
 #endif
 
-Screen::Screen(GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *display, ScreenInfo *screenInfo) :
-        _display(display), _screenInfo(screenInfo) {
+Screen::Screen(GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *display, const ScreenInfo &screenInfo, ArduinoNvs *nvs) :
+        _display(display), _screenInfo(screenInfo), _nvs(nvs) {
     _faces.emplace_back(std::make_unique<DefaultFace>(display));
     _faces.emplace_back(std::make_unique<UwUFace>(display));
-#ifdef PRIVATE
+#if PRIVATE == 1
     Private::includeFaces(&_faces, display);
 #endif
-    _nvs.begin();
 }
 
 void Screen::update(bool partial) {
     _display->setFullWindow();
     _display->fillScreen(GxEPD_WHITE);
 
-    int watchface = _nvs.getInt("watchface", 0);
+    int watchface = _nvs->getInt("watchface", 0);
     _faces.at(watchface)->draw(_screenInfo);
 
     _display->display(partial);

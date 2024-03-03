@@ -28,7 +28,7 @@ class UwUFace : public AbstractFace {
 public:
     explicit UwUFace(GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *display);
 
-    void draw(ScreenInfo *screenInfo) override;
+    void draw(const ScreenInfo &screenInfo) override;
 
     std::string getName() override { return "uwu_to_owo"; };
 

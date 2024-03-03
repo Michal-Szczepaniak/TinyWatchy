@@ -26,10 +26,10 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 class MenuOption : public AbstractOption {
 public:
     std::string getTitle() override { return "Menu"; };
-    std::string getDescription() override { return "Select option"; };
+    std::string getDescription(const StackPage& stackPage) override { return "Select option"; };
     void onNextButtonPressed() override {};
     void onPrevButtonPressed() override {};
-    bool onSelectButtonPressed() override { return false; };
+    bool onSelectButtonPressed(const StackPage& stackPage) override { return false; };
     void onBackButtonPressed() override {};
 };
 

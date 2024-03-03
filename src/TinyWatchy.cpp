@@ -23,35 +23,34 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "WiFiHelper.h"
 #include "MenuOptions/MenuOption.h"
 #include "MenuOptions/NTPOption.h"
-#include "MenuOptions/SettingsOption.h"
 #include "MenuOptions/Private/Include.h"
 
-bool TinyWatchy::_displayFullInit = true;
 BMA423 TinyWatchy::_accelerometer;
+bool TinyWatchy::_accelerometerStatus = false;
+bool TinyWatchy::_displayFullInit = true;
 
-TinyWatchy::TinyWatchy() : _smallRTC(new SmallRTC), _display(new GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>(
-        WatchyDisplay(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY))), _screenInfo(new ScreenInfo),
-                           _screen(new Screen(_display.get(), _screenInfo.get())), _ntp(new NTP(_smallRTC.get())),
-                           _menu(new Menu), _alarmHandler(new AlarmHandler(_smallRTC.get(), &_accelerometer)) {
-
-    _menu->appendOption(new MenuOption);
-    _menu->appendOption(new NTPOption(_ntp.get()));
-#ifdef PRIVATE
-    Private::includeOptions(_menu.get());
-#endif
-    _menu->appendOption(new SettingsOption(&_accelerometer, _screen.get()));
+TinyWatchy::TinyWatchy() : _display(WatchyDisplay(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY)),
+        _screen(&_display, _screenInfo, &_nvs), _ntp(&_smallRTC),
+        _menu(&_ntp, &_accelerometer, &_smallRTC, &_screen, &_nvs),
+        _alarmHandler(&_smallRTC, &_accelerometer, &_accelerometerStatus, &_nvs) {
 }
 
 void TinyWatchy::setup() {
     esp_sleep_wakeup_cause_t wakeupReason = esp_sleep_get_wakeup_cause();
 
     Serial.begin(115200);
-    Wire.begin(SDA, SCL);
-    _smallRTC->init();
 
-    _display->epd2.selectSPI(SPI, SPISettings(20000000, MSBFIRST, SPI_MODE0));
-    _display->init(0, _displayFullInit, 10, true);
-    _display->epd2.setBusyCallback(TinyWatchy::displayBusyCallbackHelper, this);
+    pinMode(VIB_MOTOR_PIN, OUTPUT);
+    digitalWrite(VIB_MOTOR_PIN, LOW);
+    gpio_hold_dis((gpio_num_t)VIB_MOTOR_PIN);
+
+    Wire.begin(SDA, SCL);
+    _nvs.begin();
+    _smallRTC.init();
+
+    _display.epd2.selectSPI(SPI, SPISettings(20000000, MSBFIRST, SPI_MODE0));
+    _display.init(0, _displayFullInit, 10, true);
+    _display.epd2.setBusyCallback(TinyWatchy::displayBusyCallbackHelper, this);
 
     updateData();
 
@@ -64,33 +63,34 @@ void TinyWatchy::handleWakeUp(esp_sleep_wakeup_cause_t reason) {
     switch (reason) {
         case ESP_SLEEP_WAKEUP_EXT0:
             updateMenu();
-            _alarmHandler->handle(_screenInfo.get());
-            _screen->update(true);
+            _alarmHandler.handle(&_screenInfo);
+            _screen.update(true);
             break;
         case ESP_SLEEP_WAKEUP_EXT1:
-            _accelerometer.getINT();
-            _menu->handleButtonPress();
+            if (esp_sleep_get_ext1_wakeup_status() & ACC_INT_MASK) {
+                _accelerometer.getINT();
+            }
+            _menu.handleButtonPress();
             updateMenu();
-            _screen->update(true);
+            _screen.update(true);
             break;
         default:
             setupAccelerometer();
             updateMenu();
-            _screen->update(false);
+            _screen.update(false);
             break;
     }
 }
 
 void TinyWatchy::deepSleep() {
-    _display->hibernate();
+    _display.hibernate();
 
     if (_displayFullInit) {
         esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
-        _smallRTC->clearAlarm();
         _displayFullInit = false;
     }
 
-    _smallRTC->setAtHourAlarm(SLEEP_START);
+    _alarmHandler.setNextAlarm(_screenInfo.time);
 
     const uint64_t ignore = 0b11110001000000110000100111000010;
     for (int i = 0; i < GPIO_NUM_MAX; i++) {
@@ -116,29 +116,29 @@ void TinyWatchy::updateBatteryVoltage() {
     voltage -= 3.6f;
     voltage = std::round(voltage * 166.6666666666667f);
 
-    _screenInfo->battery = static_cast<uint8_t>(voltage);
+    _screenInfo.battery = static_cast<uint8_t>(voltage);
 }
 
 void TinyWatchy::updateData() {
-    _smallRTC->read((tmElements_t &) _screenInfo->time);
+    _smallRTC.read((tmElements_t &) _screenInfo.time);
     updateBatteryVoltage();
 
-    _screenInfo->humanInSleep = (_screenInfo->time.hour >= SLEEP_START && _screenInfo->time.hour < SLEEP_END);
+    _screenInfo.humanInSleep = (_screenInfo.time.hour >= SLEEP_START && _screenInfo.time.hour < SLEEP_END);
     if (!_displayFullInit) {
-        _screenInfo->steps = _accelerometer.getCounter();
-
-        if (_screenInfo->humanInSleep) {
-            _accelerometer.disableAccel();
-        } else {
-            _accelerometer.enableAccel();
+        _screenInfo.steps = _accelerometer.getCounter();
+    } else {
+        int64_t drift = _nvs.getInt("drift", 0);
+        bool driftFast = _nvs.getInt("drift_fast", 0);
+        if (drift != 0) {
+            _smallRTC.setDrift(drift, driftFast, false);
         }
     }
 }
 
 void TinyWatchy::updateMenu() {
-    _screenInfo->title = _menu->getTitle();
-    _screenInfo->description = _menu->getDescription();
-    _screenInfo->onMainOption = _menu->isMainOption();
+    _screenInfo.title = _menu.getTitle();
+    _screenInfo.description = _menu.getDescription();
+    _screenInfo.onMainOption = _menu.isMainOption();
 }
 
 void TinyWatchy::setupAccelerometer() {
@@ -156,6 +156,7 @@ void TinyWatchy::setupAccelerometer() {
     _accelerometer.setAccelConfig(cfg);
     _accelerometer.wakeUp();
     _accelerometer.enableAccel();
+    _accelerometerStatus = true;
 
     struct bma4_int_pin_config config = {
         .edge_ctrl = BMA4_EDGE_TRIGGER,

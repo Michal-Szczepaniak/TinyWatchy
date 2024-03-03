@@ -56,14 +56,16 @@ private:
     static uint16_t writeRegisterHelper(uint8_t address, uint8_t reg, uint8_t *data, uint16_t len);
 
 private:
-    std::unique_ptr<SmallRTC> _smallRTC;
-    std::unique_ptr<GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT>> _display;
-    std::unique_ptr<ScreenInfo> _screenInfo;
-    std::unique_ptr<Screen> _screen;
-    std::unique_ptr<NTP> _ntp;
-    std::unique_ptr<Menu> _menu;
-    std::unique_ptr<AlarmHandler> _alarmHandler;
+    ArduinoNvs _nvs;
+    SmallRTC _smallRTC;
+    GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> _display;
+    ScreenInfo _screenInfo;
+    Screen _screen;
+    NTP _ntp;
+    Menu _menu;
+    AlarmHandler _alarmHandler;
     RTC_DATA_ATTR static BMA423 _accelerometer;
+    RTC_DATA_ATTR static bool _accelerometerStatus;
     RTC_DATA_ATTR static bool _displayFullInit;
 };
 

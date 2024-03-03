@@ -29,10 +29,10 @@ public:
     explicit NTPOption(NTP *ntp);
 
     std::string getTitle() override { return "NTP Sync"; };
-    std::string getDescription() override;
+    std::string getDescription(const StackPage& stackPage) override;
     void onNextButtonPressed() override {};
     void onPrevButtonPressed() override {};
-    bool onSelectButtonPressed() override;
+    bool onSelectButtonPressed(const StackPage& stackPage) override;
     void onBackButtonPressed() override {};
 
 private:

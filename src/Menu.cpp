@@ -24,9 +24,13 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "buttons.h"
 #include "defines.h"
 #include "defines_private.h"
+#if PRIVATE == 1
+#include "MenuOptions/Private/Include.h"
+#endif
 
-uint8_t Menu::_level = 0;
-uint8_t Menu::_optionId = 0;
+uint8_t Menu::_currentStackPage = 0;
+
+StackPage Menu::_pageStack[3] = {{}, {}, {}};
 
 const std::map<uint8_t, std::map<uint8_t, int>> Menu::_buttonMap = {
         {
@@ -49,9 +53,15 @@ const std::map<uint8_t, std::map<uint8_t, int>> Menu::_buttonMap = {
         }
 };
 
-void Menu::appendOption(AbstractOption *option) {
-    option->setLevel(&_level);
-    _options.emplace_back(option);
+Menu::Menu(NTP *ntp, BMA423* accelerometer, SmallRTC *smallRTC, Screen *screen, ArduinoNvs *nvs) : _ntpOption(ntp),
+   _settingsSubmenu("Settings", "Open settings", [this]{ changePage(1); return false; }),
+   _accelerometerOption(accelerometer), _watchfaceOption(screen, nvs), _driftOption(ntp, smallRTC, nvs)
+#if PRIVATE == 1
+   , _abstractOption1(PrivateOptions::getOption1())
+#endif
+   {
+
+
 }
 
 void Menu::handleButtonPress() {
@@ -74,8 +84,7 @@ void Menu::handleButtonPress() {
             selectOption();
             break;
         case Button::BACK:
-            if (_level)
-                backOption();
+            backOption();
             break;
         default:
             break;
@@ -83,11 +92,15 @@ void Menu::handleButtonPress() {
 }
 
 std::string Menu::getTitle() {
-    return _options[_optionId]->getTitle();
+    return getCurrentItem()->getTitle();
 }
 
 std::string Menu::getDescription() {
-    return _options[_optionId]->getDescription();
+    return getCurrentItem()->getDescription(getCurrentStackPage());
+}
+
+bool Menu::isMainOption() {
+    return _currentStackPage == 0 && getCurrentStackPage().itemIndex == 0;
 }
 
 uint8_t Menu::getButtonPressed(const uint64_t &wakeupBit) {
@@ -105,40 +118,65 @@ uint8_t Menu::getButtonPressed(const uint64_t &wakeupBit) {
 }
 
 void Menu::nextOption() {
-    if (!_level) {
-        _optionId++;
+    StackPage& page = getCurrentStackPage();
+    if (page.selected) {
+        getCurrentItem()->onNextButtonPressed();
+        return;
+    }
 
-        if (_optionId == _options.size()) {
-            _optionId = 0;
-        }
+    const MenuPage& currentPage = getCurrentPage();
+    if (page.itemIndex+1 >= currentPage.items.size()) {
+        page.itemIndex = 0;
     } else {
-        _options[_optionId]->onNextButtonPressed();
+        page.itemIndex++;
     }
 }
 
 void Menu::prevOption() {
-    if (!_level) {
-        if (_optionId == 0) {
-            _optionId = _options.size()-1;
-        } else {
-            _optionId--;
-        }
+    StackPage& page = getCurrentStackPage();
+    if (page.selected) {
+        getCurrentItem()->onPrevButtonPressed();
+        return;
+    }
+
+    const MenuPage& currentPage = getCurrentPage();
+    if (page.itemIndex == 0) {
+        page.itemIndex = currentPage.items.size()-1;
     } else {
-        _options[_optionId]->onPrevButtonPressed();
+        page.itemIndex--;
     }
 }
 
 void Menu::selectOption() {
-    if (_options[_optionId]->onSelectButtonPressed()) {
-        _level++;
+    bool ret = getCurrentItem()->onSelectButtonPressed(getCurrentStackPage());
+    if (ret) {
+        getCurrentStackPage().selected = true;
     }
 }
 
 void Menu::backOption() {
-    _options[_optionId]->onBackButtonPressed();
-    _level--;
+    if (getCurrentStackPage().selected) {
+        getCurrentStackPage().selected = false;
+    } else if (_currentStackPage > 0) {
+        _currentStackPage--;
+    }
 }
 
-bool Menu::isMainOption() {
-    return _optionId == 0;
+const MenuPage& Menu::getCurrentPage() {
+    return _pages[getCurrentStackPage().pageIndex];
+}
+
+AbstractOption* Menu::getCurrentItem() {
+    return getCurrentPage().items[getCurrentStackPage().itemIndex];
+}
+
+StackPage& Menu::getCurrentStackPage() {
+    return _pageStack[_currentStackPage];
+}
+
+void Menu::changePage(uint8_t menuPage) {
+    if (_currentStackPage == 2) return;
+
+    _currentStackPage++;
+    getCurrentStackPage().pageIndex = menuPage;
 }

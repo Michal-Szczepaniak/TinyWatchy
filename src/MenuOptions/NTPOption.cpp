@@ -23,7 +23,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 NTPOption::NTPOption(NTP *ntp) : _ntp(ntp) {
 }
 
-std::string NTPOption::getDescription() {
+std::string NTPOption::getDescription(const StackPage& stackPage) {
     std::string message = _error ? "Error syncing" : _synced ? "Synced" : "Sync time via NTP";
 
     _synced = false;
@@ -32,7 +32,7 @@ std::string NTPOption::getDescription() {
     return message;
 }
 
-bool NTPOption::onSelectButtonPressed() {
+bool NTPOption::onSelectButtonPressed(const StackPage& stackPage) {
     if (_synced) return false;
 
     if (!_ntp->sync()) {

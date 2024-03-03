@@ -29,6 +29,8 @@ public:
 
     bool sync();
 
+    time_t getTime();
+
 private:
     SmallRTC *_smallRTC{};
 };

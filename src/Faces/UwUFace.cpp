@@ -40,7 +40,7 @@ UwUFace::UwUFace(GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> *display) : Abs
 
 }
 
-void UwUFace::draw(ScreenInfo *screenInfo) {
+void UwUFace::draw(const ScreenInfo &screenInfo) {
     _display->drawBitmap(0, 25, resources::POINT_IMAGE, POINT_IMAGE_WIDTH, POINT_IMAGE_HEIGHT, GxEPD_BLACK);
 
     long rnd = 0;
@@ -58,11 +58,11 @@ void UwUFace::draw(ScreenInfo *screenInfo) {
         GxEPD_BLACK
     );
 
-    drawTime(screenInfo->time);
-    drawBattery(screenInfo->battery);
-    drawSteps(screenInfo->steps);
-    drawMenuTitle(screenInfo->title);
-    drawMenuDescription(screenInfo->description);
+    drawTime(screenInfo.time);
+    drawBattery(screenInfo.battery);
+    drawSteps(screenInfo.steps);
+    drawMenuTitle(screenInfo.title);
+    drawMenuDescription(screenInfo.description);
 }
 
 void UwUFace::drawTime(const DateTime &time) {
