@@ -157,6 +157,7 @@ void Menu::selectOption() {
 void Menu::backOption() {
     if (getCurrentStackPage().selected) {
         getCurrentStackPage().selected = false;
+        getCurrentItem()->onBackButtonPressed();
     } else if (_currentStackPage > 0) {
         _currentStackPage--;
     }
