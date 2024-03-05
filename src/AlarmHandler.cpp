@@ -62,6 +62,5 @@ void AlarmHandler::setNextAlarm(const DateTime &time) {
 
     uint16_t currentIndex = alarmTimeToIndex(time.hour, time.minute);
     Alarm nextAlarm = getNextAlarm(currentIndex);
-    Serial.printf("Next alarm: %d:%d\n", nextAlarm.hour, nextAlarm.minute);
     _smallRTC->atTimeWake(nextAlarm.hour, nextAlarm.minute, true);
 }

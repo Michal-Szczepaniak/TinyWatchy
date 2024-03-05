@@ -37,7 +37,6 @@ bool NTP::sync() {
 time_t NTP::getTime() {
     if (!WiFiHelper::connect()) {
         WiFiHelper::disconnect();
-        Serial.println("Disconnect");
         return 0;
     }
 

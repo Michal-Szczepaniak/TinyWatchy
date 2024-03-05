@@ -37,6 +37,8 @@ public:
             _smallRTC->endDrift(time, false);
             _nvs->setInt("drift", _smallRTC->getDrift(false));
             _nvs->setInt("drift_fast", _smallRTC->isFastDrift(false));
+            int64_t drift = _nvs->getInt("drift", 0);
+            bool driftFast = _nvs->getInt("drift_fast", 0);
         }
 
         _nvs->setInt("drift_status", !correctionInProgress);

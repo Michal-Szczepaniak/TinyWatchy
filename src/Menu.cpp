@@ -155,9 +155,9 @@ void Menu::selectOption() {
 }
 
 void Menu::backOption() {
+    getCurrentItem()->onBackButtonPressed();
     if (getCurrentStackPage().selected) {
         getCurrentStackPage().selected = false;
-        getCurrentItem()->onBackButtonPressed();
     } else if (_currentStackPage > 0) {
         _currentStackPage--;
     }
@@ -180,4 +180,6 @@ void Menu::changePage(uint8_t menuPage) {
 
     _currentStackPage++;
     getCurrentStackPage().pageIndex = menuPage;
+    getCurrentStackPage().itemIndex = 0;
+    getCurrentStackPage().selected = false;
 }

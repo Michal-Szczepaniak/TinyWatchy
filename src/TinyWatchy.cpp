@@ -38,15 +38,15 @@ TinyWatchy::TinyWatchy() : _display(WatchyDisplay(DISPLAY_CS, DISPLAY_DC, DISPLA
 void TinyWatchy::setup() {
     esp_sleep_wakeup_cause_t wakeupReason = esp_sleep_get_wakeup_cause();
 
-    Serial.begin(115200);
-
     pinMode(VIB_MOTOR_PIN, OUTPUT);
     digitalWrite(VIB_MOTOR_PIN, LOW);
     gpio_hold_dis((gpio_num_t)VIB_MOTOR_PIN);
 
     Wire.begin(SDA, SCL);
     _nvs.begin();
-    _smallRTC.init();
+    if (_displayFullInit) {
+        _smallRTC.init();
+    }
 
     _display.epd2.selectSPI(SPI, SPISettings(20000000, MSBFIRST, SPI_MODE0));
     _display.init(0, _displayFullInit, 10, true);
@@ -124,9 +124,9 @@ void TinyWatchy::updateData() {
     updateBatteryVoltage();
 
     _screenInfo.humanInSleep = (_screenInfo.time.hour >= SLEEP_START && _screenInfo.time.hour < SLEEP_END);
-    if (!_displayFullInit) {
+    if (!_displayFullInit && !_screenInfo.humanInSleep) {
         _screenInfo.steps = _accelerometer.getCounter();
-    } else {
+    } else if (_displayFullInit) {
         int64_t drift = _nvs.getInt("drift", 0);
         bool driftFast = _nvs.getInt("drift_fast", 0);
         if (drift != 0) {
