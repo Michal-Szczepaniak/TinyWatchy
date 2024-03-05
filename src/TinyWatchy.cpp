@@ -23,7 +23,6 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "WiFiHelper.h"
 #include "MenuOptions/MenuOption.h"
 #include "MenuOptions/NTPOption.h"
-#include "MenuOptions/Private/Include.h"
 
 BMA423 TinyWatchy::_accelerometer;
 bool TinyWatchy::_accelerometerStatus = false;
