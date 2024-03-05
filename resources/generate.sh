@@ -17,9 +17,13 @@ echo -e ''
 echo "Processing fonts"
 cd fonts/
 bash convertFonts.sh
-cd private/
-bash convertFonts.sh
-cd ../../
+if test -d private/; then
+    cd private/
+    bash convertFonts.sh
+    cd ../
+fi
+
+cd ../
 
 echo -e '};\n' >> resources.h
 echo -e '#endif //TINYWATCHY_RESOURCES_H' >> resources.h
