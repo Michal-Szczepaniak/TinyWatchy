@@ -123,9 +123,11 @@ void TinyWatchy::updateData() {
     updateBatteryVoltage();
 
     _screenInfo.humanInSleep = (_screenInfo.time.hour >= SLEEP_START && _screenInfo.time.hour < SLEEP_END);
-    if (!_displayFullInit && !_screenInfo.humanInSleep) {
+    if (!_displayFullInit && _accelerometerStatus) {
         _screenInfo.steps = _accelerometer.getCounter();
-    } else if (_displayFullInit) {
+    }
+
+    if (_displayFullInit) {
         int64_t drift = _nvs.getInt("drift", 0);
         bool driftFast = _nvs.getInt("drift_fast", 0);
         if (drift != 0) {

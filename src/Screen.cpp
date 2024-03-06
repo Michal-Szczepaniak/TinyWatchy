@@ -39,6 +39,10 @@ void Screen::update(bool partial) {
     _display->fillScreen(GxEPD_WHITE);
 
     int watchface = _nvs->getInt("watchface", 0);
+    if (watchface >= _faces.size()) {
+        _nvs->setInt("watchface", 0);
+        watchface = 0;
+    }
     _faces.at(watchface)->draw(_screenInfo);
 
     _display->display(partial);
