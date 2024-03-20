@@ -57,13 +57,13 @@ private:
 
 private:
     ArduinoNvs _nvs;
-    SmallRTC _smallRTC;
     GxEPD2_BW<WatchyDisplay, WatchyDisplay::HEIGHT> _display;
     ScreenInfo _screenInfo;
     Screen _screen;
     NTP _ntp;
     Menu _menu;
     AlarmHandler _alarmHandler;
+    RTC_DATA_ATTR static SmallRTC _smallRTC;
     RTC_DATA_ATTR static BMA423 _accelerometer;
     RTC_DATA_ATTR static bool _accelerometerStatus;
     RTC_DATA_ATTR static bool _displayFullInit;

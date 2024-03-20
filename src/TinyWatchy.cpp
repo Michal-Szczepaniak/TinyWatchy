@@ -24,6 +24,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "MenuOptions/MenuOption.h"
 #include "MenuOptions/NTPOption.h"
 
+SmallRTC TinyWatchy::_smallRTC;
 BMA423 TinyWatchy::_accelerometer;
 bool TinyWatchy::_accelerometerStatus = false;
 bool TinyWatchy::_displayFullInit = true;
