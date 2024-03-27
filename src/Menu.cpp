@@ -158,8 +158,13 @@ void Menu::backOption() {
     getCurrentItem()->onBackButtonPressed();
     if (getCurrentStackPage().selected) {
         getCurrentStackPage().selected = false;
-    } else if (_currentStackPage > 0) {
+        return;
+    }
+
+    if (_currentStackPage > 0) {
         _currentStackPage--;
+    }  else {
+        getCurrentStackPage().itemIndex = 0;
     }
 }
 
