@@ -8,7 +8,7 @@ Every watchface **has to** extend `AbstractOption` interface.
 
 `AbstractOption` consts of following methods:
 
-- `virtual std::string getTitle() = 0;`: Used to get title of the option. It's supposed to be static. Length will be standardised at later date.
+- `virtual std::string getTitle() = 0;`: Used to get title of the option. It's supposed to be static. Length is maximum 10 characters.
 - `virtual std::string getDescription(const StackPage& stackPage) = 0;`: Used to get description aka actual information/menu from your feature. This is basically all the output you have. Be concise, maximum 20 characters. StackPage contains property selected which you can use.
 - `virtual void onNextButtonPressed() = 0;`: Handler for next button press. It won't be called unless your option is selected (if you allow such a thing). You can use it to do whatever you like. Can be submenu, doesn't have to be.
 - `virtual void onPrevButtonPressed() = 0;`: As above just button for previous option.

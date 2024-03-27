@@ -10,11 +10,6 @@ AlarmHandler::AlarmHandler(SmallRTC *smallRTC, BMA423 *accel, bool *accelStatus,
 {
     _alarms[alarmTimeToIndex(SLEEP_START)] = {SLEEP_START, 0, true};
     _alarms[alarmTimeToIndex(SLEEP_END)] = {SLEEP_END, 0, true};
-
-    std::vector<uint8_t> alarmTime = _nvs->getBlob("alarm");
-    if (!alarmTime.empty()) {
-        _alarms[alarmTimeToIndex(alarmTime[0], alarmTime[1])] = {alarmTime[0], alarmTime[1], false};
-    }
 }
 
 void AlarmHandler::handle(ScreenInfo const *screenInfo) {
@@ -22,6 +17,8 @@ void AlarmHandler::handle(ScreenInfo const *screenInfo) {
     AlarmHandlerPrivate privateHandler(_smallRTC, _accel);
     privateHandler.handle(screenInfo);
 #endif
+
+    loadUserAlarm();
 
     uint16_t currentIndex = alarmTimeToIndex(screenInfo->time.hour, screenInfo->time.minute);
     try {
@@ -43,7 +40,6 @@ void AlarmHandler::handle(ScreenInfo const *screenInfo) {
 }
 
 AlarmHandler::Alarm AlarmHandler::getNextAlarm(const uint16_t &currentIndex) {
-
     for (std::pair<uint16_t, Alarm> alarm : _alarms) {
         if (alarm.first > currentIndex) {
             return alarm.second;
@@ -60,7 +56,19 @@ uint16_t AlarmHandler::alarmTimeToIndex(uint8_t hour, uint8_t minute) {
 void AlarmHandler::setNextAlarm(const DateTime &time) {
     _smallRTC->clearAlarm();
 
+    loadUserAlarm();
+
     uint16_t currentIndex = alarmTimeToIndex(time.hour, time.minute);
     Alarm nextAlarm = getNextAlarm(currentIndex);
     _smallRTC->atTimeWake(nextAlarm.hour, nextAlarm.minute, true);
+}
+
+void AlarmHandler::loadUserAlarm() {
+    if (_userAlarmLoaded) return;
+
+    std::vector<uint8_t> alarmTime = _nvs->getBlob("alarm");
+    if (!alarmTime.empty()) {
+        _alarms[alarmTimeToIndex(alarmTime[0], alarmTime[1])] = {alarmTime[0], alarmTime[1], false};
+        _userAlarmLoaded = true;
+    }
 }

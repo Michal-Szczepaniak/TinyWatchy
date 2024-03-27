@@ -53,9 +53,12 @@ const std::map<uint8_t, std::map<uint8_t, int>> Menu::_buttonMap = {
         }
 };
 
-Menu::Menu(NTP *ntp, BMA423* accelerometer, SmallRTC *smallRTC, Screen *screen, ArduinoNvs *nvs) : _ntpOption(ntp),
+Menu::Menu(NTP *ntp, BMA423* accelerometer, SmallRTC *smallRTC, Screen *screen, ArduinoNvs *nvs,
+           AlarmHandler *alarmHandler) : _ntpOption(ntp),
    _settingsSubmenu("Settings", "Open settings", [this]{ changePage(1); return false; }),
-   _accelerometerOption(accelerometer), _watchfaceOption(screen, nvs), _driftOption(ntp, smallRTC, nvs)
+   _alarmSubmenu(">Alarm", "Manage alarm", [this]{ changePage(2); return false; }),
+   _accelerometerOption(accelerometer), _watchfaceOption(screen, nvs), _driftOption(ntp, smallRTC, nvs),
+   _alarmSetOption(alarmHandler, nvs), _alarmClearOption(nvs)
 #if PRIVATE == 1
    , _abstractOption1(PrivateOptions::getOption1())
 #endif

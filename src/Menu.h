@@ -38,10 +38,14 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "MenuOptions/WatchfaceOption.h"
 #include "MenuOptions/DriftOption.h"
 #include "MenuOptions/UiOption.h"
+#include "AlarmHandler.h"
+#include "MenuOptions/AlarmSetOption.h"
+#include "MenuOptions/AlarmClearOption.h"
 
 class Menu {
 public:
-    Menu(NTP *ntp, BMA423* accelerometer, SmallRTC *smallRTC, Screen *screen, ArduinoNvs *nvs);
+    Menu(NTP *ntp, BMA423* accelerometer, SmallRTC *smallRTC, Screen *screen, ArduinoNvs *nvs,
+         AlarmHandler *alarmHandler);
     void handleButtonPress();
 
     std::string getTitle();
@@ -63,20 +67,22 @@ private:
     RTC_DATA_ATTR static uint8_t _currentStackPage;
     RTC_DATA_ATTR static StackPage _pageStack[3];
     static const std::map<uint8_t, std::map<uint8_t, int>> _buttonMap;
-    Screen *_screen;
     MenuOption _menuOption;
     NTPOption _ntpOption;
     SubMenuOption _settingsSubmenu;
+    SubMenuOption _alarmSubmenu;
     AboutOption _aboutOption;
     VoltageOption _voltageOption;
     AccelerometerOption _accelerometerOption;
     WatchfaceOption _watchfaceOption;
     DriftOption _driftOption;
     UiOption _uiOption;
+    AlarmSetOption _alarmSetOption;
+    AlarmClearOption _alarmClearOption;
 #if PRIVATE == 1
     AbstractOption *_abstractOption1;
 #endif
-    const MenuPage _pages[2] = {
+    const MenuPage _pages[3] = {
         {
             .items = {
                 &_menuOption,
@@ -90,11 +96,18 @@ private:
         {
             .items = {
                 &_aboutOption,
+                &_alarmSubmenu,
                 &_accelerometerOption,
                 &_voltageOption,
                 &_watchfaceOption,
                 &_driftOption,
                 &_uiOption,
+            }
+        },
+        {
+            .items = {
+                &_alarmSetOption,
+                &_alarmClearOption,
             }
         }
     };

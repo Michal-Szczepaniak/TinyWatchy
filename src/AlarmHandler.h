@@ -24,12 +24,14 @@ private:
     static uint16_t alarmTimeToIndex(uint8_t hour, uint8_t minute = 0);
 
     Alarm getNextAlarm(const uint16_t &currentIndex);
+    void loadUserAlarm();
 
 private:
     SmallRTC *_smallRTC;
     BMA423 *_accel;
     bool *_accelStatus;
     ArduinoNvs *_nvs;
+    bool _userAlarmLoaded = false;
 
     std::map<uint16_t, Alarm> _alarms;
 };

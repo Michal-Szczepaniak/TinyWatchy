@@ -31,8 +31,8 @@ bool TinyWatchy::_displayFullInit = true;
 
 TinyWatchy::TinyWatchy() : _display(WatchyDisplay(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY)),
         _screen(&_display, _screenInfo, &_nvs), _ntp(&_smallRTC),
-        _menu(&_ntp, &_accelerometer, &_smallRTC, &_screen, &_nvs),
-        _alarmHandler(&_smallRTC, &_accelerometer, &_accelerometerStatus, &_nvs) {
+        _alarmHandler(&_smallRTC, &_accelerometer, &_accelerometerStatus, &_nvs),
+        _menu(&_ntp, &_accelerometer, &_smallRTC, &_screen, &_nvs, &_alarmHandler) {
 }
 
 void TinyWatchy::setup() {
