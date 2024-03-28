@@ -27,6 +27,10 @@ NTP::NTP(SmallRTC *smallRTC) : _smallRTC(smallRTC) {}
 bool NTP::sync() {
     time_t epochTime = getTime();
 
+    if (epochTime == 0) {
+        return false;
+    }
+
     tmElements_t time;
     _smallRTC->doBreakTime(epochTime, time);
     _smallRTC->set(time);
