@@ -3,7 +3,7 @@
 
 #define WIFI_SSID ""
 #define WIFI_PASS ""
-#define TIMEZONE 3600 // Use as offset
+#define TIMEZONE "GMT" // POSIX timezone, look up https://support.cyberdata.net/portal/en/kb/articles/010d63c0cfce3676151e1f2d5442e311 or something
 
 #define SLEEP_START 1
 #define SLEEP_END 9

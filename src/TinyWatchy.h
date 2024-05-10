@@ -52,6 +52,7 @@ private:
     void updateMenu();
     void setupAccelerometer();
 
+    static DateTime getLocalTime(DateTime time);
     static uint16_t readRegisterHelper(uint8_t address, uint8_t reg, uint8_t *data, uint16_t len);
     static uint16_t writeRegisterHelper(uint8_t address, uint8_t reg, uint8_t *data, uint16_t len);
 

@@ -120,7 +120,10 @@ void TinyWatchy::updateBatteryVoltage() {
 }
 
 void TinyWatchy::updateData() {
-    _smallRTC.read((tmElements_t &) _screenInfo.time);
+    DateTime time;
+    _smallRTC.read((tmElements_t &) time);
+    _screenInfo.time = getLocalTime(time);
+
     updateBatteryVoltage();
 
     _screenInfo.humanInSleep = (_screenInfo.time.hour >= SLEEP_START && _screenInfo.time.hour < SLEEP_END);
@@ -186,6 +189,25 @@ void TinyWatchy::setupAccelerometer() {
     _accelerometer.resetStepCounter();
 
     _accelerometer.enableWakeupInterrupt();
+}
+
+DateTime TinyWatchy::getLocalTime(DateTime time) {
+    setenv("TZ", TIMEZONE, 1);
+    tzset();
+
+    time_t tempTime = makeTime((tmElements_t &)time);
+    struct tm *tempTM = localtime(&tempTime);
+
+    DateTime localTime;
+    localTime.second = tempTM->tm_sec;
+    localTime.minute = tempTM->tm_min;
+    localTime.hour = tempTM->tm_hour;
+    localTime.day = tempTM->tm_mday;
+    localTime.month = tempTM->tm_mon;
+    localTime.dayOfTheWeek = tempTM->tm_wday;
+    localTime.year = tempTM->tm_year;
+
+    return localTime;
 }
 
 uint16_t TinyWatchy::readRegisterHelper(uint8_t address, uint8_t reg, uint8_t *data, uint16_t len) {
