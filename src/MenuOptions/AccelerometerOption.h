@@ -1,8 +1,10 @@
 #ifndef TINYWATCHY_ACCELEROMETEROPTION_H
 #define TINYWATCHY_ACCELEROMETEROPTION_H
 
+#include <sstream>
 #include "AbstractOption.h"
 #include "Watchy/bma.h"
+#include "AccelParser.h"
 
 class AccelerometerOption : public AbstractOption {
 public:
@@ -13,20 +15,27 @@ public:
     }
 
     std::string getDescription(const StackPage& stackPage) override {
-        Accel _data;
+        Accel data;
 
-        if (!_accelerometer->getAccel(_data)) {
+        if (!_accelerometer->getAccel(data)) {
             return "Couldn't get accelerometer data";
         }
 
-        std::string text = "X: ";
-        text.append(std::to_string(_data.x));
-        text.append(" Y: ");
-        text.append(std::to_string(_data.y));
-        text.append(" Z: ");
-        text.append(std::to_string(_data.z));
+        AccelParser::Vector3 angles = AccelParser::normalizeAccel(data);
 
-        return text;
+        std::ostringstream text;
+        text.precision(2);
+        text
+            << "X: "
+            << angles.x
+            << "° Y: "
+            << angles.y
+            << "° Z: "
+            << angles.z
+            << "°"
+        ;
+
+        return text.str();
     }
 
     void onNextButtonPressed() override {}

@@ -54,7 +54,7 @@ const std::map<uint8_t, std::map<uint8_t, int>> Menu::_buttonMap = {
 };
 
 Menu::Menu(NTP *ntp, BMA423* accelerometer, SmallRTC *smallRTC, Screen *screen, ArduinoNvs *nvs,
-           AlarmHandler *alarmHandler) : _ntpOption(ntp),
+           AlarmHandler *alarmHandler) : _ntpOption(ntp), _accelerometer(accelerometer),
    _settingsSubmenu("Settings", "Open settings", [this]{ changePage(1); return false; }),
    _alarmSubmenu(">Alarm", "Manage alarm", [this]{ changePage(2); return false; }),
    _accelerometerOption(accelerometer), _watchfaceOption(screen, nvs), _driftOption(ntp, smallRTC, nvs),
@@ -71,6 +71,14 @@ void Menu::handleButtonPress() {
     uint64_t wakeupBit = esp_sleep_get_ext1_wakeup_status();
 
     if (!(wakeupBit & (RIGHT_BTN_MASK | LEFT_BTN_MASK | SELECT_BTN_MASK | BACK_BTN_MASK))) {
+        return;
+    }
+
+    Accel data;
+    bool gotData = _accelerometer->getAccel(data);
+    AccelParser::Orientation orientation = AccelParser::normalizeOrientation(data);
+
+    if (gotData && orientation == AccelParser::RIGHT_EDGE) {
         return;
     }
 

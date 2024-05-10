@@ -67,8 +67,9 @@ private:
     RTC_DATA_ATTR static uint8_t _currentStackPage;
     RTC_DATA_ATTR static StackPage _pageStack[3];
     static const std::map<uint8_t, std::map<uint8_t, int>> _buttonMap;
-    MenuOption _menuOption;
     NTPOption _ntpOption;
+    BMA423 *_accelerometer;
+    MenuOption _menuOption;
     SubMenuOption _settingsSubmenu;
     SubMenuOption _alarmSubmenu;
     AboutOption _aboutOption;
