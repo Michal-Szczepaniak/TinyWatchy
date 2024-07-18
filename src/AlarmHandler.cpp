@@ -53,14 +53,34 @@ uint16_t AlarmHandler::alarmTimeToIndex(uint8_t hour, uint8_t minute) {
     return minute + hour*100;
 }
 
-void AlarmHandler::setNextAlarm(const DateTime &time) {
+void AlarmHandler::setNextAlarm(const DateTime &screenTime) {
     _smallRTC->clearAlarm();
 
     loadUserAlarm();
 
-    uint16_t currentIndex = alarmTimeToIndex(time.hour, time.minute);
+    DateTime utcTime;
+    _smallRTC->read((tmElements_t &) utcTime);
+
+    uint16_t currentIndex = alarmTimeToIndex(screenTime.hour, screenTime.minute);
     Alarm nextAlarm = getNextAlarm(currentIndex);
-    _smallRTC->atTimeWake(nextAlarm.hour, nextAlarm.minute, true);
+
+    DateTime timeDiff = screenTime - utcTime;
+    DateTime alarmTimeTmp = {
+        .minute = nextAlarm.minute,
+        .hour = nextAlarm.hour,
+    };
+    DateTime alarmTime = alarmTimeTmp - timeDiff;
+
+    Serial.printf("Wake up: %d:%d, current index: %d, localhour: %d:%d, utchour: %d:%d, time diff: %d:%d, alarm time: %d:%d\n",
+        nextAlarm.hour, nextAlarm.minute,
+        currentIndex,
+        screenTime.hour, screenTime.minute,
+        utcTime.hour, utcTime.minute,
+        timeDiff.hour, timeDiff.minute,
+        alarmTime.hour, alarmTime.minute
+    );
+
+    _smallRTC->atTimeWake(alarmTime.hour, alarmTime.minute, true);
 }
 
 void AlarmHandler::loadUserAlarm() {

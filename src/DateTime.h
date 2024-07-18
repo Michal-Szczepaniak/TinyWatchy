@@ -23,7 +23,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 
 #include <cstdint>
 
-typedef struct {
+typedef struct DateTime {
     uint8_t second;
     uint8_t minute;
     uint8_t hour;
@@ -31,6 +31,25 @@ typedef struct {
     uint8_t day;
     uint8_t month;
     uint8_t year;   // offset from 1970;
+
+    DateTime operator-(const DateTime& other) const
+    {
+        DateTime result;
+
+        if (hour < other.hour) {
+            result.hour = (hour + 24) - other.hour;
+        } else {
+            result.hour = hour - other.hour;
+        }
+
+        if (minute < other.minute) {
+            result.minute = (minute + 60) - other.minute;
+        } else {
+            result.minute = minute - other.minute;
+        }
+
+        return result;
+    }
 } DateTime;
 
 #endif //TINYWATCHY_DATETIME_H
