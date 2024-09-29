@@ -5,7 +5,7 @@
 
 There are some command line tools, we will need to be able to bootstrap. The following package names are for Ubuntu 22.04, you should be able to figure the corresponding out on any other system.
 
-	apt install libfreetype-dev imagemagick
+	apt install libfreetype-dev imagemagick xxd
 
 ## Building your private defines file
 
