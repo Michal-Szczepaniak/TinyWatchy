@@ -13,9 +13,8 @@ TinyWatchy is an alternative firmware for Watchy, designed with a focus on power
 
 ## Getting Started
 
-To get started with TinyWatchy, follow these steps:
+To get started with TinyWatchy, follow these steps [Getting started](docs/Getting_started.md)
 
-1. **Download the Latest Release**: Visit the [Releases](https://github.com/Michal-Szczepaniak/TinyWatchy/releases) page and download the latest version of TinyWatchy.
 
 ## Contributing
 

@@ -2,7 +2,7 @@
 
 for f in $(find . -name '*.png');
 do
-    if [[ $f == *".sh"* ]] || [[ $f == *".h"* ]] || [[ $f == "eink-2color.png" ]] || [[ $f == *".txt"* ]]; then
+    if [[ $f == *".sh"* ]] || [[ $f == *".h"* ]] || [[ $f == "eink_2color.png" ]] || [[ $f == *".txt"* ]]; then
         continue
     fi
 
@@ -22,7 +22,9 @@ do
     identify -ping -format '#define '${fne}'_HEIGHT %h' $f >> ../resources.h
     echo -e '\n' >> ../resources.h
 
-    convert $f -dither FloydSteinberg -define dither:diffusion-amount=90% -remap eink_2color.png -negate -depth 1 gray:- | xxd -i -n $fne | sed 's/unsigned/const unsigned/g' | sed '/_len = /d' >> ../resources.h
+    convert $f -dither FloydSteinberg -define dither:diffusion-amount=90% -remap eink_2color.png -negate -depth 1 ${fne}
+    xxd -i ${fne} | sed 's/unsigned/const unsigned/g' | sed '/_len = /d' >> ../resources.h
     echo -e '' >> ../resources.h
+    rm ${fne}
 
 done
