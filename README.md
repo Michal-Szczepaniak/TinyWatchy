@@ -15,7 +15,9 @@ TinyWatchy is an alternative firmware for Watchy, designed with a focus on power
 
 To get started with TinyWatchy, follow these steps:
 
-1. **Download the Latest Release**: Visit the [Releases](https://github.com/Michal-Szczepaniak/TinyWatchy/releases) page and download the latest version of TinyWatchy.
+1. Go to resources and run generate.sh. If you have too old xxd just download latest binary from github
+2. Go to src, rename `defines_private.h.template` to `defines_private.h` and modify the contents to your heart's content
+3. Now `pio run`
 
 ## Contributing
 
