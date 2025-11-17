@@ -21,18 +21,14 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #ifndef TINYWATCHY_NTP_H
 #define TINYWATCHY_NTP_H
 
-#include "SmallRTC.h"
+#include <ctime>
+#include "YatchyTime.h"
 
 class NTP {
 public:
-    explicit NTP(SmallRTC *smallRTC);
-
     bool sync();
 
     time_t getTime();
-
-private:
-    SmallRTC *_smallRTC{};
 };
 
 #endif //TINYWATCHY_NTP_H

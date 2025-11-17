@@ -22,11 +22,10 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #define TINYWATCHY_SCREENINFO_H
 
 #include <string>
-#include "TimeLib.h"
 #include "DateTime.h"
 
 struct ScreenInfo {
-    DateTime time{};
+    struct tm time{};
     uint32_t steps = 0;
     uint8_t battery = 0;
     std::string title;

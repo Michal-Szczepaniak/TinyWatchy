@@ -35,25 +35,25 @@ void DefaultFace::draw(const ScreenInfo &screenInfo) {
     drawMenuDescription(screenInfo.description);
 }
 
-void DefaultFace::drawTime(const DateTime &time) {
+void DefaultFace::drawTime(const struct tm &time) {
     _display->setFont(&resources::DIGITAL_DISPLAY_REGULAR_50);
     _display->setTextColor(GxEPD_BLACK);
     _display->setCursor(5, 50 + 18);
 
-    if (time.hour < 10) {
+    if (time.tm_hour < 10) {
         _display->print("0");
     }
 
-    _display->print(time.hour);
+    _display->print(time.tm_hour);
     _display->setCursor(82, 50 + 18);
     _display->print(":");
 
     _display->setCursor(114, 50 + 18);
-    if (time.minute < 10) {
+    if (time.tm_min < 10) {
         _display->print("0");
     }
 
-    _display->println(time.minute);
+    _display->println(time.tm_min);
 }
 
 void DefaultFace::drawBattery(const uint8_t &battery) {

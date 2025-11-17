@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "AlarmHandler.h"
 #if PRIVATE == 1
 #include "Private/AlarmHandlerPrivate.h"
@@ -5,8 +6,8 @@
 #include "defines_private.h"
 #include "defines.h"
 
-AlarmHandler::AlarmHandler(SmallRTC *smallRTC, BMA423 *accel, bool *accelStatus, ArduinoNvs *nvs) :
-    _smallRTC(smallRTC), _accel(accel), _accelStatus(accelStatus), _nvs(nvs)
+AlarmHandler::AlarmHandler(BMA423 *accel, bool *accelStatus, ArduinoNvs *nvs) :
+    _accel(accel), _accelStatus(accelStatus), _nvs(nvs)
 {
     _alarms[alarmTimeToIndex(SLEEP_START)] = {SLEEP_START, 0, true};
     _alarms[alarmTimeToIndex(SLEEP_END)] = {SLEEP_END, 0, true};
@@ -14,13 +15,13 @@ AlarmHandler::AlarmHandler(SmallRTC *smallRTC, BMA423 *accel, bool *accelStatus,
 
 void AlarmHandler::handle(ScreenInfo const *screenInfo) {
 #if PRIVATE == 1
-    AlarmHandlerPrivate privateHandler(_smallRTC, _accel);
+    AlarmHandlerPrivate privateHandler(_accel);
     privateHandler.handle(screenInfo);
 #endif
 
     loadUserAlarm();
 
-    uint16_t currentIndex = alarmTimeToIndex(screenInfo->time.hour, screenInfo->time.minute);
+    uint16_t currentIndex = alarmTimeToIndex(screenInfo->time.tm_hour, screenInfo->time.tm_min);
     try {
         const Alarm &alarm = _alarms.at(currentIndex);
 
@@ -53,18 +54,23 @@ uint16_t AlarmHandler::alarmTimeToIndex(uint8_t hour, uint8_t minute) {
     return minute + hour*100;
 }
 
-void AlarmHandler::setNextAlarm(const DateTime &screenTime) {
-    _smallRTC->clearAlarm();
-
+void AlarmHandler::setNextAlarm(const struct tm &screenTime) {
     loadUserAlarm();
 
     DateTime utcTime;
-    _smallRTC->read((tmElements_t &) utcTime);
 
-    uint16_t currentIndex = alarmTimeToIndex(screenTime.hour, screenTime.minute);
+    uint16_t currentIndex = alarmTimeToIndex(screenTime.tm_hour, screenTime.tm_min);
     Alarm nextAlarm = getNextAlarm(currentIndex);
 
-    DateTime timeDiff = screenTime - utcTime;
+    DateTime timeDiff = {
+            .second = static_cast<uint8_t>(screenTime.tm_sec),
+            .minute = static_cast<uint8_t>(screenTime.tm_min),
+            .hour = static_cast<uint8_t>(screenTime.tm_hour),
+            .dayOfTheWeek = static_cast<uint8_t>(screenTime.tm_wday),
+            .day = static_cast<uint8_t>(screenTime.tm_mday),
+            .month = static_cast<uint8_t>(screenTime.tm_mday),
+            .year = static_cast<uint8_t>(screenTime.tm_year),
+    };// = screenTime;// - utcTime;
     DateTime alarmTimeTmp = {
         .minute = nextAlarm.minute,
         .hour = nextAlarm.hour,
@@ -74,13 +80,13 @@ void AlarmHandler::setNextAlarm(const DateTime &screenTime) {
     Serial.printf("Wake up: %d:%d, current index: %d, localhour: %d:%d, utchour: %d:%d, time diff: %d:%d, alarm time: %d:%d\n",
         nextAlarm.hour, nextAlarm.minute,
         currentIndex,
-        screenTime.hour, screenTime.minute,
+        screenTime.tm_hour, screenTime.tm_min,
         utcTime.hour, utcTime.minute,
         timeDiff.hour, timeDiff.minute,
         alarmTime.hour, alarmTime.minute
     );
 
-    _smallRTC->atTimeWake(alarmTime.hour, alarmTime.minute, true);
+    YatchyTime::setAlarm(alarmTime.hour, alarmTime.minute);
 }
 
 void AlarmHandler::loadUserAlarm() {

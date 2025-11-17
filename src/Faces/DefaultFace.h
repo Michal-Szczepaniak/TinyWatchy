@@ -32,7 +32,7 @@ public:
     std::string getName() override { return "Default"; };
 
 private:
-    void drawTime(const DateTime &time);
+    void drawTime(const struct tm &time);
     void drawBattery(const uint8_t &battery);
     void drawSteps(const unsigned int &steps);
     void drawMenuTitle(const std::string &title);

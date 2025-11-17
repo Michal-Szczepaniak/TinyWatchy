@@ -22,18 +22,16 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "WiFiHelper.h"
 #include "NTPClient.h"
 
-NTP::NTP(SmallRTC *smallRTC) : _smallRTC(smallRTC) {}
-
 bool NTP::sync() {
     time_t epochTime = getTime();
+    Serial.printf("Epoch time: %lld\n", epochTime);
 
     if (epochTime == 0) {
         return false;
     }
 
-    tmElements_t time;
-    _smallRTC->doBreakTime(epochTime, time);
-    _smallRTC->set(time);
+    struct tm time = YatchyTime::getTimeFromTimeT(epochTime);
+    YatchyTime::setTime(time);
 
     return true;
 }

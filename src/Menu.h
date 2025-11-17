@@ -44,8 +44,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 
 class Menu {
 public:
-    Menu(NTP *ntp, BMA423* accelerometer, SmallRTC *smallRTC, Screen *screen, ArduinoNvs *nvs,
-         AlarmHandler *alarmHandler);
+    Menu(NTP *ntp, BMA423* accelerometer, Screen *screen, ArduinoNvs *nvs, AlarmHandler *alarmHandler);
     void handleButtonPress();
 
     std::string getTitle();

@@ -2,13 +2,12 @@
 #define TINYWATCHY_DRIFTOPTION_H
 
 #include "AbstractOption.h"
-#include "SmallRTC.h"
 #include "NTP.h"
 #include "ArduinoNvs.h"
 
 class DriftOption : public AbstractOption {
 public:
-    DriftOption(NTP *ntp, SmallRTC *smallRTC, ArduinoNvs *nvs) : _ntp(ntp), _smallRTC(smallRTC), _nvs(nvs) {}
+    DriftOption(NTP *ntp, ArduinoNvs *nvs) : _ntp(ntp), _nvs(nvs) {}
 
     std::string getTitle() override {
         return ">Drift";
@@ -28,18 +27,17 @@ public:
 
         time_t ntpTime = _ntp->getTime();
 
-        tmElements_t time;
-        _smallRTC->doBreakTime(ntpTime, time);
+        struct tm time = *localtime(&ntpTime);
 
-        if (!correctionInProgress) {
-            _smallRTC->beginDrift(time, false);
+        /*if (!correctionInProgress) {
+            _yatchyTime->beginDrift(time, false);
         } else {
-            _smallRTC->endDrift(time, false);
-            _nvs->setInt("drift", _smallRTC->getDrift(false));
-            _nvs->setInt("drift_fast", _smallRTC->isFastDrift(false));
-        }
+            _yatchyTime->endDrift(time, false);
+            _nvs->setInt("drift", _yatchyTime->getDrift(false));
+            _nvs->setInt("drift_fast", _yatchyTime->isFastDrift(false));
+        }*/
 
-        _nvs->setInt("drift_status", !correctionInProgress);
+        _nvs->setInt("drift_status", (int32_t)!correctionInProgress);
         _changed = true;
 
         return false;
@@ -49,7 +47,6 @@ public:
 
 private:
     NTP *_ntp;
-    SmallRTC *_smallRTC;
     ArduinoNvs *_nvs;
     bool _changed = false;
 };

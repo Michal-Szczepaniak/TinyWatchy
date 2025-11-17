@@ -2,10 +2,10 @@
 #define TINYWATCHY_ALARMHANDLER_H
 
 #include <map>
-#include "SmallRTC.h"
 #include "Watchy/bma.h"
 #include "ScreenInfo.h"
 #include "ArduinoNvs.h"
+#include "YatchyTime.h"
 
 class AlarmHandler {
 public:
@@ -15,10 +15,10 @@ public:
         bool system = false;
     };
 
-    explicit AlarmHandler(SmallRTC *smallRTC, BMA423 *accel, bool *_accelStatus, ArduinoNvs *nvs);
+    explicit AlarmHandler(BMA423 *accel, bool *_accelStatus, ArduinoNvs *nvs);
 
     void handle(ScreenInfo const *screenInfo);
-    void setNextAlarm(const DateTime &time);
+    void setNextAlarm(const struct tm &time);
 
 private:
     static uint16_t alarmTimeToIndex(uint8_t hour, uint8_t minute = 0);
@@ -27,7 +27,6 @@ private:
     void loadUserAlarm();
 
 private:
-    SmallRTC *_smallRTC;
     BMA423 *_accel;
     bool *_accelStatus;
     ArduinoNvs *_nvs;

@@ -65,25 +65,25 @@ void UwUFace::draw(const ScreenInfo &screenInfo) {
     drawMenuDescription(screenInfo.description);
 }
 
-void UwUFace::drawTime(const DateTime &time) {
+void UwUFace::drawTime(const struct tm &time) {
     _display->setFont(&resources::EIGHT_BIT_OPERATOR_PLUS_BOLD_22);
     _display->setTextColor(GxEPD_BLACK);
     _display->setCursor(70, 40);
 
-    if (time.hour < 10) {
+    if (time.tm_hour < 10) {
         _display->print("0");
     }
 
-    _display->print(time.hour);
+    _display->print(time.tm_hour);
     _display->setCursor(124, 38);
     _display->print(":");
 
     _display->setCursor(140, 40);
-    if (time.minute < 10) {
+    if (time.tm_min < 10) {
         _display->print("0");
     }
 
-    _display->println(time.minute);
+    _display->println(time.tm_min);
 }
 
 void UwUFace::drawBattery(const uint8_t &battery) {

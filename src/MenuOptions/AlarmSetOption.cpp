@@ -133,6 +133,8 @@ uint8_t AlarmSetOption::getModuloForCurrentStep() const {
         case MINUTES_FIRST:
         case MINUTES_SECOND:
             return 60;
+        default:
+            return 0;
     }
 }
 
@@ -144,6 +146,8 @@ uint8_t AlarmSetOption::getStepSizeForCurrentStep() const {
         case HOURS_SECOND:
         case MINUTES_SECOND:
             return 1;
+        default:
+            return 0;
     }
 }
 

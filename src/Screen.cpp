@@ -40,7 +40,7 @@ void Screen::update(bool partial) {
 
     int watchface = _nvs->getInt("watchface", 0);
     if (watchface >= _faces.size()) {
-        _nvs->setInt("watchface", 0);
+        _nvs->setInt("watchface", (int32_t)0);
         watchface = 0;
     }
     _faces.at(watchface)->draw(_screenInfo);

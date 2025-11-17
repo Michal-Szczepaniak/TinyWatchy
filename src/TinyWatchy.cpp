@@ -24,30 +24,48 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "MenuOptions/MenuOption.h"
 #include "MenuOptions/NTPOption.h"
 
-SmallRTC TinyWatchy::_smallRTC;
+
 BMA423 TinyWatchy::_accelerometer;
 bool TinyWatchy::_accelerometerStatus = false;
 bool TinyWatchy::_displayFullInit = true;
 
 TinyWatchy::TinyWatchy() : _display(WatchyDisplay(DISPLAY_CS, DISPLAY_DC, DISPLAY_RES, DISPLAY_BUSY)),
-        _screen(&_display, _screenInfo, &_nvs), _ntp(&_smallRTC),
-        _alarmHandler(&_smallRTC, &_accelerometer, &_accelerometerStatus, &_nvs),
-        _menu(&_ntp, &_accelerometer, &_smallRTC, &_screen, &_nvs, &_alarmHandler) {
+        _screen(&_display, _screenInfo, &_nvs), _ntp(),
+        _alarmHandler(&_accelerometer, &_accelerometerStatus, &_nvs),
+        _menu(&_ntp, &_accelerometer, &_screen, &_nvs, &_alarmHandler) {
 }
 
 void TinyWatchy::setup() {
     esp_sleep_wakeup_cause_t wakeupReason = esp_sleep_get_wakeup_cause();
 
-    pinMode(VIB_MOTOR_PIN, OUTPUT);
-    digitalWrite(VIB_MOTOR_PIN, LOW);
-    gpio_hold_dis((gpio_num_t)VIB_MOTOR_PIN);
+//    pinMode(VIB_MOTOR_PIN, OUTPUT);
+//    digitalWrite(VIB_MOTOR_PIN, LOW);
+//    gpio_hold_dis((gpio_num_t)VIB_MOTOR_PIN);
+    Serial.begin(115200);
+    while(!Serial);
 
-    Wire.begin(SDA, SCL);
+    pinMode(DISPLAY_DC, OUTPUT);
+    pinMode(DISPLAY_RES, OUTPUT);
+    pinMode(DISPLAY_RES, OUTPUT);
+
+    bool i2c = false;
+    while (!i2c) {
+        bool res = Wire.begin(SCL, SDA, 100 * 1000);
+        if (!res) {
+            Serial.println("oops");
+            continue;
+        }
+
+        Serial.println("Got wire?");
+        Wire.setTimeOut(100);
+        i2c = true;
+    }
+    delay(100);
     _nvs.begin();
     if (_displayFullInit) {
-        _smallRTC.init();
     }
 
+    SPI.begin(18, 19, 23, 5);
     _display.epd2.selectSPI(SPI, SPISettings(20000000, MSBFIRST, SPI_MODE0));
     _display.init(0, _displayFullInit, 10, true);
     _display.epd2.setBusyCallback(TinyWatchy::displayBusyCallbackHelper, this);
@@ -56,7 +74,7 @@ void TinyWatchy::setup() {
 
     handleWakeUp(wakeupReason);
 
-    deepSleep();
+//    deepSleep();
 }
 
 void TinyWatchy::handleWakeUp(esp_sleep_wakeup_cause_t reason) {
@@ -67,7 +85,7 @@ void TinyWatchy::handleWakeUp(esp_sleep_wakeup_cause_t reason) {
             _screen.update(true);
             break;
         case ESP_SLEEP_WAKEUP_EXT1:
-            if (esp_sleep_get_ext1_wakeup_status() & ACC_INT_MASK) {
+            if (esp_sleep_get_ext1_wakeup_status() & ((uint64_t)(((uint64_t)1)<<14))) {
                 _accelerometer.getINT();
             }
             _menu.handleButtonPress();
@@ -99,10 +117,10 @@ void TinyWatchy::deepSleep() {
         pinMode(i, INPUT);
     }
 
-    esp_sleep_enable_ext0_wakeup((gpio_num_t) RTC_INT_PIN, 0);
-    esp_sleep_enable_ext1_wakeup(RIGHT_BTN_MASK | LEFT_BTN_MASK | BACK_BTN_MASK |
-                                 SELECT_BTN_MASK | ACC_INT_MASK,
-                                 ESP_EXT1_WAKEUP_ANY_HIGH);
+//    esp_sleep_enable_ext0_wakeup((gpio_num_t) RTC_INT_PIN, 0);
+//    esp_sleep_enable_ext1_wakeup(RIGHT_BTN_MASK | LEFT_BTN_MASK | BACK_BTN_MASK |
+//                                 SELECT_BTN_MASK | ACC_INT_MASK,
+//                                 ESP_EXT1_WAKEUP_ANY_HIGH);
     esp_deep_sleep_start();
 }
 
@@ -120,13 +138,12 @@ void TinyWatchy::updateBatteryVoltage() {
 }
 
 void TinyWatchy::updateData() {
-    DateTime time;
-    _smallRTC.read((tmElements_t &) time);
-    _screenInfo.time = getLocalTime(time);
+    struct tm time = YatchyTime::getTime();
+    _screenInfo.time = time;
 
     updateBatteryVoltage();
 
-    _screenInfo.humanInSleep = (_screenInfo.time.hour >= SLEEP_START && _screenInfo.time.hour < SLEEP_END);
+    _screenInfo.humanInSleep = (_screenInfo.time.tm_hour >= SLEEP_START && _screenInfo.time.tm_hour < SLEEP_END);
     if (!_displayFullInit && _accelerometerStatus) {
         _screenInfo.steps = _accelerometer.getCounter();
     }
@@ -135,7 +152,7 @@ void TinyWatchy::updateData() {
         int64_t drift = _nvs.getInt("drift", 0);
         bool driftFast = _nvs.getInt("drift_fast", 0);
         if (drift != 0) {
-            _smallRTC.setDrift(drift, driftFast, false);
+
         }
     }
 }
@@ -189,25 +206,6 @@ void TinyWatchy::setupAccelerometer() {
     _accelerometer.resetStepCounter();
 
     _accelerometer.enableWakeupInterrupt();
-}
-
-DateTime TinyWatchy::getLocalTime(DateTime time) {
-    setenv("TZ", TIMEZONE, 1);
-    tzset();
-
-    time_t tempTime = makeTime((tmElements_t &)time);
-    struct tm *tempTM = localtime(&tempTime);
-
-    DateTime localTime;
-    localTime.second = tempTM->tm_sec;
-    localTime.minute = tempTM->tm_min;
-    localTime.hour = tempTM->tm_hour;
-    localTime.day = tempTM->tm_mday;
-    localTime.month = tempTM->tm_mon;
-    localTime.dayOfTheWeek = tempTM->tm_wday;
-    localTime.year = tempTM->tm_year;
-
-    return localTime;
 }
 
 uint16_t TinyWatchy::readRegisterHelper(uint8_t address, uint8_t reg, uint8_t *data, uint16_t len) {

@@ -22,7 +22,6 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #define TINYWATCHY_TINYWATCHY_H
 
 #include <Arduino.h>
-#include <SmallRTC.h>
 #include "Watchy/bma.h"
 #include "Watchy/Display.h"
 #include <GxEPD2_BW.h>
@@ -32,6 +31,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "NTP.h"
 #include "Menu.h"
 #include "AlarmHandler.h"
+#include "YatchyTime.h"
 
 class TinyWatchy {
 public:
@@ -52,7 +52,6 @@ private:
     void updateMenu();
     void setupAccelerometer();
 
-    static DateTime getLocalTime(DateTime time);
     static uint16_t readRegisterHelper(uint8_t address, uint8_t reg, uint8_t *data, uint16_t len);
     static uint16_t writeRegisterHelper(uint8_t address, uint8_t reg, uint8_t *data, uint16_t len);
 
@@ -64,7 +63,6 @@ private:
     NTP _ntp;
     Menu _menu;
     AlarmHandler _alarmHandler;
-    RTC_DATA_ATTR static SmallRTC _smallRTC;
     RTC_DATA_ATTR static BMA423 _accelerometer;
     RTC_DATA_ATTR static bool _accelerometerStatus;
     RTC_DATA_ATTR static bool _displayFullInit;

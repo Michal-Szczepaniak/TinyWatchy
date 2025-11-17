@@ -26,15 +26,15 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #define LEFT_BTN_PIN 26
 #define SELECT_BTN_PIN 35
 #define BACK_BTN_PIN 25
-#define DISPLAY_CS 5
-#define DISPLAY_RES 9
-#define DISPLAY_DC 10
-#define DISPLAY_BUSY 19
+#define DISPLAY_CS -1
+#define DISPLAY_RES 2
+#define DISPLAY_DC 3
+#define DISPLAY_BUSY 4
 #define ACC_INT_1_PIN 14
 #define ACC_INT_2_PIN 12
 #define VIB_MOTOR_PIN 13
 #define RTC_INT_PIN 27
-#define BATT_ADC_PIN 34
+#define BATT_ADC_PIN 6
 
 // HW info
 #define RTC_TYPE 2 //PCF8563
@@ -42,11 +42,11 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #define WIFI_TIMEOUT 60000
 
 // Pin masks
-#define RIGHT_BTN_MASK GPIO_SEL_4
-#define LEFT_BTN_MASK GPIO_SEL_26
-#define SELECT_BTN_MASK GPIO_SEL_35
-#define BACK_BTN_MASK GPIO_SEL_25
-#define ACC_INT_MASK GPIO_SEL_14
-#define RTC_INT_MASK GPIO_SEL_27
+//#define RIGHT_BTN_MASK GPIO_SEL_4
+//#define LEFT_BTN_MASK GPIO_SEL_26
+//#define SELECT_BTN_MASK GPIO_SEL_35
+//#define BACK_BTN_MASK GPIO_SEL_25
+//#define ACC_INT_MASK GPIO_SEL_14
+//#define RTC_INT_MASK GPIO_SEL_27
 
 #endif //TINYWATCHY_DEFINES_H

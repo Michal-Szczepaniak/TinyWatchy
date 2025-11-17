@@ -51,7 +51,7 @@ public:
     }
 
     static bool isConnected() {
-        return WiFiClass::status() == WL_CONNECTED;
+        return WiFi.status() == WL_CONNECTED;
     }
 };
 

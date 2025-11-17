@@ -19,10 +19,14 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "TinyWatchy.h"
+#include "defines_private.h"
 
 TinyWatchy tinyWatchy;
 
 void setup() {
+    setenv("TZ", TIMEZONE, 1);
+    tzset();
+
     tinyWatchy.setup();
 }
 

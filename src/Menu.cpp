@@ -53,11 +53,11 @@ const std::map<uint8_t, std::map<uint8_t, int>> Menu::_buttonMap = {
         }
 };
 
-Menu::Menu(NTP *ntp, BMA423* accelerometer, SmallRTC *smallRTC, Screen *screen, ArduinoNvs *nvs,
+Menu::Menu(NTP *ntp, BMA423* accelerometer, Screen *screen, ArduinoNvs *nvs,
            AlarmHandler *alarmHandler) : _ntpOption(ntp), _accelerometer(accelerometer),
    _settingsSubmenu("Settings", "Open settings", [this]{ changePage(1); return false; }),
    _alarmSubmenu(">Alarm", "Manage alarm", [this]{ changePage(2); return false; }),
-   _accelerometerOption(accelerometer), _watchfaceOption(screen, nvs), _driftOption(ntp, smallRTC, nvs),
+   _accelerometerOption(accelerometer), _watchfaceOption(screen, nvs), _driftOption(ntp, nvs),
    _alarmSetOption(alarmHandler, nvs), _alarmClearOption(nvs)
 #if PRIVATE == 1
    , _abstractOption1(PrivateOptions::getOption1())
@@ -69,10 +69,11 @@ Menu::Menu(NTP *ntp, BMA423* accelerometer, SmallRTC *smallRTC, Screen *screen, 
 
 void Menu::handleButtonPress() {
     uint64_t wakeupBit = esp_sleep_get_ext1_wakeup_status();
+    return;
 
-    if (!(wakeupBit & (RIGHT_BTN_MASK | LEFT_BTN_MASK | SELECT_BTN_MASK | BACK_BTN_MASK))) {
-        return;
-    }
+//    if (!(wakeupBit & (RIGHT_BTN_MASK | LEFT_BTN_MASK | SELECT_BTN_MASK | BACK_BTN_MASK))) {
+//        return;
+//    }
 
     Accel data;
     bool gotData = _accelerometer->getAccel(data);
@@ -115,7 +116,7 @@ bool Menu::isMainOption() {
 }
 
 uint8_t Menu::getButtonPressed(const uint64_t &wakeupBit) {
-    if (wakeupBit & RIGHT_BTN_MASK) {
+    /*if (wakeupBit & RIGHT_BTN_MASK) {
         return RIGHT_BTN_PIN;
     } else if (wakeupBit & LEFT_BTN_MASK) {
         return LEFT_BTN_PIN;
@@ -123,7 +124,7 @@ uint8_t Menu::getButtonPressed(const uint64_t &wakeupBit) {
         return SELECT_BTN_PIN;
     } else if (wakeupBit & BACK_BTN_MASK) {
         return BACK_BTN_PIN;
-    }
+    }*/
 
     return 0;
 }
