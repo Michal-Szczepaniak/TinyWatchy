@@ -42,39 +42,43 @@ void TinyWatchy::setup() {
 //    digitalWrite(VIB_MOTOR_PIN, LOW);
 //    gpio_hold_dis((gpio_num_t)VIB_MOTOR_PIN);
     Serial.begin(115200);
-    while(!Serial);
+    while(!Serial.available());
 
     pinMode(DISPLAY_DC, OUTPUT);
     pinMode(DISPLAY_RES, OUTPUT);
     pinMode(DISPLAY_RES, OUTPUT);
 
-    bool i2c = false;
-    while (!i2c) {
-        bool res = Wire.begin(SCL, SDA, 100 * 1000);
-        if (!res) {
-            Serial.println("oops");
-            continue;
-        }
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "ArgumentSelectionDefects"
+    Wire.begin(SCL, SDA, 100 * 1000);
+#pragma clang diagnostic pop
+    Wire.setTimeOut(100);
 
-        Serial.println("Got wire?");
-        Wire.setTimeOut(100);
-        i2c = true;
-    }
-    delay(100);
     _nvs.begin();
     if (_displayFullInit) {
     }
 
-    SPI.begin(18, 19, 23, 5);
+    SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI, SPI_SS);
     _display.epd2.selectSPI(SPI, SPISettings(20000000, MSBFIRST, SPI_MODE0));
     _display.init(0, _displayFullInit, 10, true);
     _display.epd2.setBusyCallback(TinyWatchy::displayBusyCallbackHelper, this);
+
+    _expander.init(true);
+    _expander.dumpAllRegisters();
+    uint16_t gpioCause = MCP23018::readRegister(INTF);
+    uint16_t gpioInterrupts = MCP23018::readRegister(INTCAP);
+
+    Serial.print("Interrupt bits: ");
+    Serial.println(gpioCause, HEX);
+    Serial.print("Interrupt cause: ");
+    Serial.println(gpioInterrupts, HEX);
+    Serial.println(wakeupReason, HEX);
 
     updateData();
 
     handleWakeUp(wakeupReason);
 
-//    deepSleep();
+    deepSleep();
 }
 
 void TinyWatchy::handleWakeUp(esp_sleep_wakeup_cause_t reason) {
@@ -103,29 +107,31 @@ void TinyWatchy::handleWakeUp(esp_sleep_wakeup_cause_t reason) {
 void TinyWatchy::deepSleep() {
     _display.hibernate();
 
+    delay(2000);
+    Serial.println("1");
     if (_displayFullInit) {
         esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
         _displayFullInit = false;
     }
+    delay(2000);
+    Serial.println("2");
 
-    _alarmHandler.setNextAlarm(_screenInfo.time);
+//    _alarmHandler.setNextAlarm(_screenInfo.time);
 
-    const uint64_t ignore = 0b11110001000000110000100111000010;
-    for (int i = 0; i < GPIO_NUM_MAX; i++) {
-        if ((ignore >> i) & 0b1)
-            continue;
-        pinMode(i, INPUT);
-    }
+//    const uint64_t ignore = 0b11110001000000110000100111000010;
+//    for (int i = 0; i < GPIO_NUM_MAX; i++) {
+//        if ((ignore >> i) & 0b1)
+//            continue;
+//        pinMode(i, INPUT);
+//    }
 
 //    esp_sleep_enable_ext0_wakeup((gpio_num_t) RTC_INT_PIN, 0);
-//    esp_sleep_enable_ext1_wakeup(RIGHT_BTN_MASK | LEFT_BTN_MASK | BACK_BTN_MASK |
-//                                 SELECT_BTN_MASK | ACC_INT_MASK,
-//                                 ESP_EXT1_WAKEUP_ANY_HIGH);
+    esp_sleep_enable_ext1_wakeup(((uint64_t)(((uint64_t)1) << MCP_INTERRUPT_PIN)), ESP_EXT1_WAKEUP_ANY_HIGH);
     esp_deep_sleep_start();
 }
 
 void TinyWatchy::updateBatteryVoltage() {
-    float voltage = static_cast<float>(analogReadMilliVolts(BATT_ADC_PIN)) / 1000.0f * 2.0f;
+    float voltage = static_cast<float>(analogReadMilliVolts(BATT_ADC_PIN)) / 710.094f;
     voltage *= 100.f;
     voltage = std::floor(voltage);
     voltage /= 100.f;

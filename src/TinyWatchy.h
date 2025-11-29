@@ -25,6 +25,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "Watchy/bma.h"
 #include "Watchy/Display.h"
 #include <GxEPD2_BW.h>
+#include <MCP23018.h>
 #include <memory>
 #include "defines.h"
 #include "Screen.h"
@@ -63,6 +64,7 @@ private:
     NTP _ntp;
     Menu _menu;
     AlarmHandler _alarmHandler;
+    MCP23018 _expander;
     RTC_DATA_ATTR static BMA423 _accelerometer;
     RTC_DATA_ATTR static bool _accelerometerStatus;
     RTC_DATA_ATTR static bool _displayFullInit;

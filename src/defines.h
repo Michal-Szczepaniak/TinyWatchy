@@ -22,14 +22,18 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #define TINYWATCHY_DEFINES_H
 
 // Pins
-#define RIGHT_BTN_PIN 4
-#define LEFT_BTN_PIN 26
+#define RIGHT_BTN_PIN  4
+#define LEFT_BTN_PIN   26
 #define SELECT_BTN_PIN 35
-#define BACK_BTN_PIN 25
-#define DISPLAY_CS -1
-#define DISPLAY_RES 2
-#define DISPLAY_DC 3
-#define DISPLAY_BUSY 4
+#define BACK_BTN_PIN   25
+#define DISPLAY_CS     (-1)
+#define DISPLAY_RES    2
+#define DISPLAY_DC     3
+#define DISPLAY_BUSY   4
+#define SPI_SCK        7
+#define SPI_MISO       (-1)
+#define SPI_MOSI       5
+#define SPI_SS         (-1)
 #define ACC_INT_1_PIN 14
 #define ACC_INT_2_PIN 12
 #define VIB_MOTOR_PIN 13
@@ -37,7 +41,6 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #define BATT_ADC_PIN 6
 
 // HW info
-#define RTC_TYPE 2 //PCF8563
 #define WIFI_HOSTNAME "TinyWatchy"
 #define WIFI_TIMEOUT 60000
 

@@ -22,8 +22,8 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #define TINYWATCHY_BUTTONS_H
 
 typedef enum {
-    RIGHT,
     LEFT,
+    RIGHT,
     SELECT,
     BACK
 } Button;
