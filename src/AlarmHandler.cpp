@@ -1,5 +1,5 @@
-#include <stdexcept>
 #include "AlarmHandler.h"
+#include <stdexcept>
 #if PRIVATE == 1
 #include "Private/AlarmHandlerPrivate.h"
 #endif
@@ -26,8 +26,8 @@ void AlarmHandler::handle(ScreenInfo const *screenInfo) {
         const Alarm &alarm = _alarms.at(currentIndex);
 
         if (!alarm.system) {
-            digitalWrite(VIB_MOTOR_PIN, HIGH);
-            gpio_hold_en((gpio_num_t)VIB_MOTOR_PIN);
+//            digitalWrite(VIB_MOTOR_PIN, HIGH);
+//            gpio_hold_en((gpio_num_t)VIB_MOTOR_PIN);
         }
     } catch (std::out_of_range&) {}
 
@@ -70,7 +70,8 @@ void AlarmHandler::setNextAlarm(const struct tm &screenTime) {
             .day = static_cast<uint8_t>(screenTime.tm_mday),
             .month = static_cast<uint8_t>(screenTime.tm_mday),
             .year = static_cast<uint8_t>(screenTime.tm_year),
-    };// = screenTime;// - utcTime;
+    };
+
     DateTime alarmTimeTmp = {
         .minute = nextAlarm.minute,
         .hour = nextAlarm.hour,

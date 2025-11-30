@@ -44,17 +44,24 @@ public:
         gpio_wakeup_enable((gpio_num_t)DISPLAY_BUSY, GPIO_INTR_LOW_LEVEL);
         esp_sleep_enable_gpio_wakeup();
         esp_light_sleep_start();
+        gpio_wakeup_disable((gpio_num_t)DISPLAY_BUSY);
     }
 private:
-    void handleWakeUp(esp_sleep_wakeup_cause_t reason);
+    void handleWakeUp();
     void deepSleep();
     void updateData();
     void updateBatteryVoltage();
     void updateMenu();
     void setupAccelerometer();
+    void setupHardware();
 
     static uint16_t readRegisterHelper(uint8_t address, uint8_t reg, uint8_t *data, uint16_t len);
     static uint16_t writeRegisterHelper(uint8_t address, uint8_t reg, uint8_t *data, uint16_t len);
+
+private:
+    static void deinitRTCIO();
+    static void initRTCIO();
+    static void dumpCoreDumpInfo();
 
 private:
     ArduinoNvs _nvs;

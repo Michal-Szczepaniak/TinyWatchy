@@ -34,6 +34,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "MenuOptions/SubMenuOption.h"
 #include "MenuOptions/AccelerometerOption.h"
 #include "MenuOptions/AboutOption.h"
+#include "MenuOptions/FlashingModeOption.h"
 #include "MenuOptions/VoltageOption.h"
 #include "MenuOptions/WatchfaceOption.h"
 #include "MenuOptions/DriftOption.h"
@@ -41,6 +42,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "AlarmHandler.h"
 #include "MenuOptions/AlarmSetOption.h"
 #include "MenuOptions/AlarmClearOption.h"
+#include "MCP23018.h"
 
 class Menu {
 public:
@@ -52,7 +54,7 @@ public:
     bool isMainOption();
 
 private:
-    static uint8_t getButtonPressed(const uint64_t &wakeupBit);
+    static uint8_t getButtonPressed(const uint16_t &wakeupBit);
     void nextOption();
     void prevOption();
     void selectOption();
@@ -72,6 +74,7 @@ private:
     SubMenuOption _settingsSubmenu;
     SubMenuOption _alarmSubmenu;
     AboutOption _aboutOption;
+    FlashingModeOption _flashingModeOption;
     VoltageOption _voltageOption;
     AccelerometerOption _accelerometerOption;
     WatchfaceOption _watchfaceOption;
@@ -99,6 +102,7 @@ private:
                 &_alarmSubmenu,
                 &_accelerometerOption,
                 &_voltageOption,
+                &_flashingModeOption,
                 &_watchfaceOption,
                 &_driftOption,
                 &_uiOption,

@@ -28,6 +28,7 @@ struct ScreenInfo {
     struct tm time{};
     uint32_t steps = 0;
     uint8_t battery = 0;
+    bool charging = false;
     std::string title;
     std::string description;
     bool onMainOption = true;

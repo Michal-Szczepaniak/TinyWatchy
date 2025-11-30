@@ -14,7 +14,7 @@ public:
     }
 
     std::string getDescription(const StackPage& stackPage) override {
-        float voltage = static_cast<float>(analogReadMilliVolts(BATT_ADC_PIN)) / 1000.0f * 2.0f;
+        float voltage = static_cast<float>(analogReadMilliVolts(BATT_ADC_PIN)) / 710.094f;
         std::ostringstream out;
         out.precision(2);
         out << std::fixed << voltage;

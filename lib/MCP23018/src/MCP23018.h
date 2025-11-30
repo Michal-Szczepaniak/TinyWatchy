@@ -11,15 +11,6 @@
 #define MCP_STAT_OUT 7 // A7
 #define MCP_5V 15 // B7
 
-// Acc
-#define MCP_ACC_INT_1 5
-#define MCP_ACC_INT_2 4
-
-/*
-#define MCP23018_SDA_PIN 22
-#define MCP23018_SCL_PIN 23
-*/
-
 #define MCP_OUTPUT 1
 #define MCP_INPUT 0
 
@@ -80,16 +71,10 @@ public:
         OUTPUT_MODE,
     };
 
-    bool init(bool withDefaultPinStates = true);
-
+    bool init();
     void deInit();
 
-    void setDefaultInterrupts();
-
-    static void setDefaultInterruptsEsp();
-
     void setInterrupt(uint8_t pin, bool interrupt);
-
     void setInterruptCause(uint8_t pin, bool enableCause, bool causeState);
 
     void setPinMode(uint8_t pin, bool mode); // false input, true output
@@ -111,15 +96,16 @@ public:
 
     static uint8_t readSingleRegister(uint8_t reg);
 
-    void setDefaultPinStates();
-
     bool resetVerify();
 
     void dumpAllRegisters();
+
+    static void clearInterrupt();
+
 private:
     String uint16ToBinaryString(uint16_t value);
     String uint8ToBinaryString(uint8_t value);
-    String decimalToHexString(int decimal);
+    static String decimalToHexString(int decimal);
 
 private:
     uint16_t _ioDirectionRegister{};

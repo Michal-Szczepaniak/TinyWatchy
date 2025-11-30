@@ -14,7 +14,7 @@ void manageGpioExpanderInterrupt() {
     }
 }
 
-bool MCP23018::init(bool withDefaultPinStates) {
+bool MCP23018::init() {
     if (!_initDone) {
         if (!resetVerify()) {
             Serial.println("Failed to reset-verify the expander");
@@ -28,16 +28,8 @@ bool MCP23018::init(bool withDefaultPinStates) {
             setPinState(i, true);
             setPinMode(i, MCP_OUTPUT);
         }
-
-        if (withDefaultPinStates) {
-            setDefaultPinStates();
-        }
     }
     return true;
-}
-
-void MCP23018::setDefaultInterruptsEsp() {
-    attachInterrupt(digitalPinToInterrupt(MCP_INTERRUPT_PIN), manageGpioExpanderInterrupt, FALLING);
 }
 
 bool MCP23018::resetVerify() {
@@ -89,18 +81,6 @@ bool MCP23018::resetVerify() {
     return true;
 }
 
-void MCP23018::setDefaultPinStates() {
-    setPinMode(MCP_5V, MCP_INPUT);
-    for (int i = 0; i < 4; i++) {
-        setPinMode(i, MCP_INPUT);
-    }
-
-    setPinState(MCP_STAT_OUT, true);
-    setPinMode(MCP_STAT_OUT, MCP_OUTPUT);
-
-    setDefaultInterrupts();
-}
-
 void MCP23018::deInit() {
     setInterrupt(MCP_STAT_IN, false);
     setPinMode(MCP_STAT_IN, MCP_OUTPUT);
@@ -112,23 +92,6 @@ bool MCP23018::digitalRead(uint8_t pin) const {
     }
 
     return checkBit(readRegister(GPIO), pin);
-}
-
-void MCP23018::setDefaultInterrupts() {
-    if (!_initDone) {
-        return;
-    }
-
-    for (int i = 0; i < 4; i++) {
-        setInterruptCause(i, true, false);
-        setPinPullUp(i, true);
-        setInterrupt(i, true);
-    }
-
-//        setInterrupt(MCP_5V, true);
-
-//    setPinMode(MCP_STAT_IN, MCP_INPUT);
-//    setInterrupt(MCP_STAT_IN, true);
 }
 
 void MCP23018::setInterrupt(uint8_t pin, bool interrupt) {
@@ -188,7 +151,7 @@ void MCP23018::setBit(uint16_t &val, uint8_t bit, bool state) {
 }
 
 bool MCP23018::checkBit(uint16_t val, uint8_t bit) {
-    return (val & (1 << bit)) != 0;
+    return (val & (1 << bit)) == 0;
 }
 
 void MCP23018::writeSingleRegister(uint8_t reg, uint8_t val) {
@@ -268,4 +231,11 @@ String MCP23018::decimalToHexString(int decimal) {
         str = "0" + str;
     }
     return "0x" + str;
+}
+
+void MCP23018::clearInterrupt() {
+    while (MCP23018::readRegister(INTF) != 0) {
+        MCP23018::readRegister(INTCAP);
+        delay(10);
+    }
 }

@@ -26,6 +26,8 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #include "defines_private.h"
 #if PRIVATE == 1
 #include "MenuOptions/Private/Include.h"
+#include "MCP23018.h"
+
 #endif
 
 uint8_t Menu::_currentStackPage = 0;
@@ -68,12 +70,16 @@ Menu::Menu(NTP *ntp, BMA423* accelerometer, Screen *screen, ArduinoNvs *nvs,
 }
 
 void Menu::handleButtonPress() {
-    uint64_t wakeupBit = esp_sleep_get_ext1_wakeup_status();
-    return;
+    uint16_t gpioInterrupts = MCP23018::readRegister(INTCAP);
 
-//    if (!(wakeupBit & (RIGHT_BTN_MASK | LEFT_BTN_MASK | SELECT_BTN_MASK | BACK_BTN_MASK))) {
-//        return;
-//    }
+    if (
+            !MCP23018::checkBit(gpioInterrupts, 0) &&
+            !MCP23018::checkBit(gpioInterrupts, 1) &&
+            !MCP23018::checkBit(gpioInterrupts, 2) &&
+            !MCP23018::checkBit(gpioInterrupts, 3)
+        ) {
+        return;
+    }
 
     Accel data;
     bool gotData = _accelerometer->getAccel(data);
@@ -83,7 +89,7 @@ void Menu::handleButtonPress() {
         return;
     }
 
-    int buttonPressed = _buttonMap.at(BUTTON_MAP).at(getButtonPressed(wakeupBit));
+    int buttonPressed = _buttonMap.at(BUTTON_MAP).at(getButtonPressed(gpioInterrupts));
 
     switch (buttonPressed) {
         case Button::RIGHT:
@@ -115,16 +121,16 @@ bool Menu::isMainOption() {
     return _currentStackPage == 0 && getCurrentStackPage().itemIndex == 0;
 }
 
-uint8_t Menu::getButtonPressed(const uint64_t &wakeupBit) {
-    /*if (wakeupBit & RIGHT_BTN_MASK) {
-        return RIGHT_BTN_PIN;
-    } else if (wakeupBit & LEFT_BTN_MASK) {
+uint8_t Menu::getButtonPressed(const uint16_t &wakeupBit) {
+    if (MCP23018::checkBit(wakeupBit, 0)) {
         return LEFT_BTN_PIN;
-    } else if (wakeupBit & SELECT_BTN_MASK) {
+    } else if (MCP23018::checkBit(wakeupBit, 1)) {
+        return RIGHT_BTN_PIN;
+    } else if (MCP23018::checkBit(wakeupBit, 2)) {
         return SELECT_BTN_PIN;
-    } else if (wakeupBit & BACK_BTN_MASK) {
+    } else if (MCP23018::checkBit(wakeupBit, 3)) {
         return BACK_BTN_PIN;
-    }*/
+    }
 
     return 0;
 }

@@ -30,7 +30,7 @@ bool NTP::sync() {
         return false;
     }
 
-    struct tm time = YatchyTime::getTimeFromTimeT(epochTime);
+    struct tm time = YatchyTime::getLocalTimeFromTimeT(epochTime);
     YatchyTime::setTime(time);
 
     return true;
