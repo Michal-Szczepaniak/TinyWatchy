@@ -274,6 +274,7 @@ void TinyWatchy::initRTCIO() {
 
 void TinyWatchy::setupHardware() {
     rtc_clk_32k_enable(true);
+    rtc_clk_slow_freq_set(RTC_SLOW_FREQ_32K_XTAL);
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "ArgumentSelectionDefects"
@@ -300,6 +301,10 @@ void TinyWatchy::setupHardware() {
 
     _expander.setPinMode(CHARGING_STATUS_PIN, MCP_INPUT);
     _expander.setInterrupt(CHARGING_STATUS_PIN, true);
+
+    _expander.setPinPullUp(10, true);
+    _expander.setPinPullUp(11, true);
+    _expander.setPinPullUp(12, true);
 
     deinitRTCIO();
 

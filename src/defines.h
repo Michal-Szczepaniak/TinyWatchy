@@ -45,7 +45,7 @@ along with TinyWatchy. If not, see <http://www.gnu.org/licenses/>.
 #define BATT_ADC_PIN 6
 
 // HW info
-#define WIFI_HOSTNAME "TinyWatchy"
+#define WIFI_HOSTNAME "TinyYatchy"
 #define WIFI_TIMEOUT 60000
 
 #endif //TINYWATCHY_DEFINES_H
